@@ -4,6 +4,10 @@ from datetime import datetime, timedelta, timezone
 import csv
 import os
 
+# Configuración de API keys de Binance
+BINANCE_API_KEY = os.getenv('BINANCE_API_KEY')
+BINANCE_SECRET_KEY = os.getenv('BINANCE_SECRET_KEY')
+
 BINANCE_API_URL = "https://api.binance.com/api/v3/ticker/price"
 BINANCE_KLINES_URL = "https://api.binance.com/api/v3/klines"
 
@@ -12,8 +16,14 @@ SIGNALS_FILE = os.path.join(DATA_DIR, 'signals.csv')
 
 def get_binance_price(symbol: str, period: str = "1d") -> dict:
     url = f"{BINANCE_API_URL}?symbol={symbol.upper()}"
+    
+    # Configurar headers con API key si está disponible
+    headers = {}
+    if BINANCE_API_KEY:
+        headers['X-MBX-APIKEY'] = BINANCE_API_KEY
+    
     try:
-        response = httpx.get(url, timeout=10)
+        response = httpx.get(url, headers=headers, timeout=10)
         response.raise_for_status()
         data = response.json()
         price_actual = float(data["price"])
@@ -62,8 +72,14 @@ def get_binance_price(symbol: str, period: str = "1d") -> dict:
 
 def get_binance_klines(symbol: str, interval: str = "1h", limit: int = 200) -> List[list]:
     url = f"{BINANCE_KLINES_URL}?symbol={symbol.upper()}&interval={interval}&limit={limit}"
+    
+    # Configurar headers con API key si está disponible
+    headers = {}
+    if BINANCE_API_KEY:
+        headers['X-MBX-APIKEY'] = BINANCE_API_KEY
+    
     try:
-        response = httpx.get(url, timeout=10)
+        response = httpx.get(url, headers=headers, timeout=10)
         response.raise_for_status()
         data = response.json()
         return data
