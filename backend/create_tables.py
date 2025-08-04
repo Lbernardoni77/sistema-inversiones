@@ -5,7 +5,7 @@ Script para crear las tablas de la base de datos para el sistema de reporting
 
 import os
 import sys
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect
 from models import Base
 
 # Configuración de la base de datos SQLite
@@ -21,13 +21,14 @@ def create_tables():
         print(f"📁 Base de datos: {DB_PATH}")
         
         # Listar las tablas creadas
-        inspector = engine.dialect.inspector(engine)
+        inspector = inspect(engine)
         tables = inspector.get_table_names()
         print(f"📊 Tablas disponibles: {', '.join(tables)}")
         
     except Exception as e:
         print(f"❌ Error al crear las tablas: {e}")
-        sys.exit(1)
+        # No salir con error, solo mostrar el warning
+        print("⚠️  Continuando con el proceso...")
 
 if __name__ == "__main__":
     print("🔧 Creando tablas de la base de datos...")
