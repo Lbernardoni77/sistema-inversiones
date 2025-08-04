@@ -154,10 +154,13 @@ function Dashboard() {
         alert(`No se encontró el ticker "${symbol}".\nVerifica el nombre e intenta nuevamente.`);
         return;
       }
-      if (!recommendation || !recommendation.recomendacion || !price || typeof price.price !== 'number') {
-        alert(`No se encontró el ticker "${symbol}".\nVerifica el nombre e intenta nuevamente.`);
+      if (!price || typeof price.price !== 'number') {
+        alert(`No se pudo obtener el precio para "${symbol}".\nVerifica el nombre e intenta nuevamente.`);
         return;
       }
+      
+      // Si no hay recomendación, usar una por defecto
+      const recomendacion = recommendation?.recomendacion || 'Mantener';
       
       // Agregar ticker a la base de datos del backend
       try {
@@ -173,7 +176,7 @@ function Dashboard() {
       const newTicker: TickerData = {
         symbol,
         price: price.price,
-        recommendation: recommendation.recomendacion,
+        recommendation: recomendacion,
         priceChange: price.change_percent ?? 0,
         lastUpdate: new Date(),
       };
