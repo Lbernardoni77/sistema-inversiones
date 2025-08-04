@@ -8,16 +8,43 @@ import os
 BINANCE_API_KEY = os.getenv('BINANCE_API_KEY')
 BINANCE_SECRET_KEY = os.getenv('BINANCE_SECRET_KEY')
 
+# URLs de APIs
 BINANCE_API_URL = "https://api.binance.com/api/v3/ticker/price"
 BINANCE_KLINES_URL = "https://api.binance.com/api/v3/klines"
+
+# API alternativa sin restricciones
+COINGECKO_API_URL = "https://api.coingecko.com/api/v3"
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data')
 SIGNALS_FILE = os.path.join(DATA_DIR, 'signals.csv')
 
 def get_binance_price(symbol: str, period: str = "1d") -> dict:
-    url = f"{BINANCE_API_URL}?symbol={symbol.upper()}"
+    # Mapeo de símbolos de Binance a CoinGecko
+    symbol_mapping = {
+        'BTCUSDT': 'bitcoin',
+        'ETHUSDT': 'ethereum',
+        'BNBUSDT': 'binancecoin',
+        'ADAUSDT': 'cardano',
+        'DOTUSDT': 'polkadot',
+        'LINKUSDT': 'chainlink',
+        'LTCUSDT': 'litecoin',
+        'BCHUSDT': 'bitcoin-cash',
+        'XRPUSDT': 'ripple',
+        'SOLUSDT': 'solana',
+        'MATICUSDT': 'matic-network',
+        'AVAXUSDT': 'avalanche-2',
+        'UNIUSDT': 'uniswap',
+        'ATOMUSDT': 'cosmos',
+        'FTMUSDT': 'fantom',
+        'NEARUSDT': 'near',
+        'ALGOUSDT': 'algorand',
+        'VETUSDT': 'vechain',
+        'ICPUSDT': 'internet-computer',
+        'FILUSDT': 'filecoin'
+    }
     
-    # Configurar headers con API key si está disponible
+    # Intentar primero con Binance
+    url = f"{BINANCE_API_URL}?symbol={symbol.upper()}"
     headers = {}
     if BINANCE_API_KEY:
         headers['X-MBX-APIKEY'] = BINANCE_API_KEY
@@ -27,6 +54,96 @@ def get_binance_price(symbol: str, period: str = "1d") -> dict:
         response.raise_for_status()
         data = response.json()
         price_actual = float(data["price"])
+        
+        # Continuar con el resto de la lógica de Binance...
+        return process_binance_data(symbol, price_actual, period)
+        
+    except Exception as e:
+        # Si Binance falla, usar CoinGecko como fallback
+        print(f"Binance falló para {symbol}, usando CoinGecko: {e}")
+        return get_coingecko_price(symbol, symbol_mapping, period)
+
+def get_coingecko_price(symbol: str, symbol_mapping: dict, period: str = "1d") -> dict:
+    """Obtener precio usando CoinGecko API como fallback"""
+    try:
+        # Buscar el ID de CoinGecko para el símbolo
+        coingecko_id = symbol_mapping.get(symbol.upper())
+        if not coingecko_id:
+            return {"error": f"Símbolo {symbol} no soportado en CoinGecko"}
+        
+        # Obtener precio actual
+        url = f"{COINGECKO_API_URL}/simple/price?ids={coingecko_id}&vs_currencies=usd&include_24hr_change=true"
+        response = httpx.get(url, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        
+        if coingecko_id not in data:
+            return {"error": f"No se encontró precio para {symbol}"}
+        
+        price_data = data[coingecko_id]
+        price_actual = price_data.get('usd', 0)
+        change_24h = price_data.get('usd_24h_change', 0)
+        
+        return {
+            "symbol": symbol.upper(),
+            "price": price_actual,
+            "change_percent": change_24h,
+            "period": period,
+            "source": "coingecko"
+        }
+        
+    except Exception as e:
+        return {"error": f"Error obteniendo precio de CoinGecko: {str(e)}"}
+
+def process_binance_data(symbol: str, price_actual: float, period: str = "1d") -> dict:
+    """Procesar datos de Binance (función auxiliar)"""
+    # Determinar cuántos días atrás buscar el cierre de referencia
+    if period == "1d":
+        limit = 2
+    elif period == "1mo":
+        limit = 31
+    elif period == "1y":
+        limit = 366
+    elif period == "all":
+        limit = 1000
+    else:
+        limit = 2
+
+    klines_url = f"{BINANCE_KLINES_URL}?symbol={symbol.upper()}&interval=1d&limit={limit}"
+    headers = {}
+    if BINANCE_API_KEY:
+        headers['X-MBX-APIKEY'] = BINANCE_API_KEY
+    
+    try:
+        klines_resp = httpx.get(klines_url, headers=headers, timeout=10)
+        klines_resp.raise_for_status()
+        klines = klines_resp.json()
+        if len(klines) < 2:
+            return {"symbol": symbol.upper(), "price": price_actual, "error": "No hay suficientes datos históricos"}
+
+        # Determinar el cierre de referencia según el periodo
+        if period == "1d":
+            close_ref = float(klines[-2][4])
+        elif period == "1mo":
+            close_ref = float(klines[-31][4]) if len(klines) >= 31 else float(klines[0][4])
+        elif period == "1y":
+            close_ref = float(klines[-366][4]) if len(klines) >= 366 else float(klines[0][4])
+        elif period == "all":
+            close_ref = float(klines[0][4])
+        else:
+            close_ref = float(klines[-2][4])
+
+        change_percent = ((price_actual - close_ref) / close_ref) * 100 if close_ref != 0 else 0
+        return {
+            "symbol": symbol.upper(),
+            "price": price_actual,
+            "close_yesterday": close_ref,
+            "change_percent": change_percent,
+            "period": period,
+            "source": "binance"
+        }
+    except Exception as e:
+        return {"error": str(e)}
 
         # Determinar cuántos días atrás buscar el cierre de referencia
         if period == "1d":
