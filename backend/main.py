@@ -183,6 +183,11 @@ scheduler.add_job(optimize_all_horizons, 'interval', days=1)
 def read_root():
     return {"mensaje": "¡Backend de inversiones funcionando!"}
 
+@app.get("/healthz")
+def health_check():
+    """Endpoint para health check de Render"""
+    return {"status": "healthy", "message": "Sistema de Inversiones funcionando correctamente"}
+
 @app.get("/binance/price/{symbol}")
 def binance_price(symbol: str, period: str = Query("1d", enum=["1d", "1mo", "1y", "all"])):
     return get_binance_price(symbol, period)
