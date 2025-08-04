@@ -1,0 +1,597 @@
+{
+  "SHIBUSDT_24h": {
+    "data": {
+      "symbol": "SHIBUSDT",
+      "recomendacion": "Mantener",
+      "puntaje_total": -2.0,
+      "motivo": [
+        "🧠 Usando pesos optimizados por aprendizaje automático",
+        "MACD bajista [peso: 1.0]",
+        "SMA 7 > SMA 21 [peso: 1.0]",
+        "Sharpe negativo [peso: 1.0]"
+      ],
+      "indicadores": {
+        "rsi": 51.85,
+        "sma_7": 0.0,
+        "sma_21": 0.0,
+        "sma_50": 0.0,
+        "sma_200": 0.0,
+        "macd": 0.0,
+        "macd_signal": 0.0,
+        "macd_hist": -0.0,
+        "bb_upper": 0.0,
+        "bb_mid": 0.0,
+        "bb_lower": 0.0,
+        "obv": -1742282850587.0,
+        "vwap": 0.0,
+        "sharpe_ratio": -1.5146,
+        "fg_index": 64,
+        "noticias_score": 0
+      },
+      "soportes": [
+        1.27e-05,
+        1.298e-05,
+        1.166e-05
+      ],
+      "resistencias": [
+        1.235e-05,
+        1.222e-05,
+        1.243e-05
+      ],
+      "contexto_sr": {
+        "influencia": null,
+        "nivel": null,
+        "precio": 1.232e-05,
+        "soportes": [
+          1.27e-05,
+          1.298e-05,
+          1.166e-05
+        ],
+        "resistencias": [
+          1.235e-05,
+          1.222e-05,
+          1.243e-05
+        ]
+      },
+      "horizonte": "24h",
+      "pesos_aplicados": {
+        "rsi": 1.0,
+        "macd": 1.0,
+        "sma": 1.0,
+        "soportes_resistencias": 1.0,
+        "sharpe": 1.0
+      }
+    },
+    "timestamp": 1754322921.3377364,
+    "created_at": "2025-08-04T12:55:21.337738"
+  },
+  "DOTUSDT_24h": {
+    "data": {
+      "symbol": "DOTUSDT",
+      "recomendacion": "Mantener",
+      "puntaje_total": 2.0,
+      "motivo": [
+        "🧠 Usando pesos optimizados por aprendizaje automático",
+        "MACD alcista [peso: 1.0]",
+        "SMA 7 > SMA 21 [peso: 1.0]",
+        "Sharpe negativo [peso: 1.0]"
+      ],
+      "indicadores": {
+        "rsi": 69.05,
+        "sma_7": 3.6511,
+        "sma_21": 3.632,
+        "sma_50": 3.5831,
+        "sma_200": 3.806,
+        "macd": 0.021,
+        "macd_signal": 0.0166,
+        "macd_hist": 0.0044,
+        "bb_upper": 3.6833,
+        "bb_mid": 3.6337,
+        "bb_lower": 3.5841,
+        "obv": -10506172.76,
+        "vwap": 3.7897,
+        "sharpe_ratio": -1.3872,
+        "fg_index": 64,
+        "noticias_score": 0
+      },
+      "soportes": [
+        3.747,
+        3.856,
+        3.868
+      ],
+      "resistencias": [
+        3.66,
+        3.627,
+        3.609
+      ],
+      "contexto_sr": {
+        "influencia": null,
+        "nivel": null,
+        "precio": 3.688,
+        "soportes": [
+          3.747,
+          3.856,
+          3.868
+        ],
+        "resistencias": [
+          3.66,
+          3.627,
+          3.609
+        ]
+      },
+      "horizonte": "24h",
+      "pesos_aplicados": {
+        "rsi": 1.0,
+        "macd": 1.0,
+        "sma": 1.0,
+        "soportes_resistencias": 1.0,
+        "sharpe": 1.0
+      }
+    },
+    "timestamp": 1754322824.658556,
+    "created_at": "2025-08-04T12:53:44.658559"
+  },
+  "ETHUSDT_24h": {
+    "data": {
+      "symbol": "ETHUSDT",
+      "recomendacion": "Mantener",
+      "puntaje_total": 0.0,
+      "motivo": [
+        "🧠 Usando pesos optimizados por aprendizaje automático",
+        "RSI alto (>70) [peso: 1.0]",
+        "MACD alcista [peso: 1.0]",
+        "SMA 7 > SMA 21 [peso: 1.0]",
+        "Sharpe negativo [peso: 1.0]"
+      ],
+      "indicadores": {
+        "rsi": 77.86,
+        "sma_7": 3590.6043,
+        "sma_21": 3550.1486,
+        "sma_50": 3492.0836,
+        "sma_200": 3687.7782,
+        "macd": 33.244,
+        "macd_signal": 24.096,
+        "macd_hist": 9.148,
+        "bb_upper": 3635.6199,
+        "bb_mid": 3552.819,
+        "bb_lower": 3470.0181,
+        "obv": -457672.9153,
+        "vwap": 3697.7498,
+        "sharpe_ratio": -1.7268,
+        "fg_index": 64,
+        "noticias_score": 0
+      },
+      "soportes": [
+        3738.37,
+        3751.45,
+        3758.88
+      ],
+      "resistencias": [
+        3571.66,
+        3533.69,
+        3509.37
+      ],
+      "contexto_sr": {
+        "influencia": null,
+        "nivel": null,
+        "precio": 3646.05,
+        "soportes": [
+          3738.37,
+          3751.45,
+          3758.88
+        ],
+        "resistencias": [
+          3571.66,
+          3533.69,
+          3509.37
+        ]
+      },
+      "horizonte": "24h",
+      "pesos_aplicados": {
+        "rsi": 1.0,
+        "macd": 1.0,
+        "sma": 1.0,
+        "soportes_resistencias": 1.0,
+        "sharpe": 1.0
+      }
+    },
+    "timestamp": 1754322829.1594083,
+    "created_at": "2025-08-04T12:53:49.159412"
+  },
+  "BTCUSDT_24h": {
+    "data": {
+      "symbol": "BTCUSDT",
+      "recomendacion": "Mantener",
+      "puntaje_total": 2.0,
+      "motivo": [
+        "🧠 Usando pesos optimizados por aprendizaje automático",
+        "MACD alcista [peso: 1.0]",
+        "SMA 7 > SMA 21 [peso: 1.0]",
+        "Sharpe negativo [peso: 1.0]"
+      ],
+      "indicadores": {
+        "rsi": 54.14,
+        "sma_7": 114575.1529,
+        "sma_21": 114527.1552,
+        "sma_50": 113867.4906,
+        "sma_200": 116406.0999,
+        "macd": 189.2866,
+        "macd_signal": 184.0052,
+        "macd_hist": 5.2815,
+        "bb_upper": 114959.4886,
+        "bb_mid": 114537.8535,
+        "bb_lower": 114116.2184,
+        "obv": -15099.2303,
+        "vwap": 116469.9845,
+        "sharpe_ratio": -3.4511,
+        "fg_index": 64,
+        "noticias_score": 0
+      },
+      "soportes": [
+        116523.14,
+        117400.01,
+        117579.99
+      ],
+      "resistencias": [
+        114899.87,
+        114025.75,
+        114009.99
+      ],
+      "contexto_sr": {
+        "influencia": null,
+        "nivel": null,
+        "precio": 114860.21,
+        "soportes": [
+          116523.14,
+          117400.01,
+          117579.99
+        ],
+        "resistencias": [
+          114899.87,
+          114025.75,
+          114009.99
+        ]
+      },
+      "horizonte": "24h",
+      "pesos_aplicados": {
+        "rsi": 1.0,
+        "macd": 1.0,
+        "sma": 1.0,
+        "soportes_resistencias": 1.0,
+        "sharpe": 1.0
+      }
+    },
+    "timestamp": 1754322850.605842,
+    "created_at": "2025-08-04T12:54:10.605845"
+  },
+  "ADAUSDT_24h": {
+    "data": {
+      "symbol": "ADAUSDT",
+      "recomendacion": "Mantener",
+      "puntaje_total": 2.0,
+      "motivo": [
+        "🧠 Usando pesos optimizados por aprendizaje automático",
+        "MACD alcista [peso: 1.0]",
+        "SMA 7 > SMA 21 [peso: 1.0]",
+        "Sharpe negativo [peso: 1.0]"
+      ],
+      "indicadores": {
+        "rsi": 62.13,
+        "sma_7": 0.7418,
+        "sma_21": 0.7361,
+        "sma_50": 0.7224,
+        "sma_200": 0.7619,
+        "macd": 0.0055,
+        "macd_signal": 0.0052,
+        "macd_hist": 0.0003,
+        "bb_upper": 0.7495,
+        "bb_mid": 0.7367,
+        "bb_lower": 0.7239,
+        "obv": -37184411.2,
+        "vwap": 0.7614,
+        "sharpe_ratio": -1.3523,
+        "fg_index": 64,
+        "noticias_score": 0
+      },
+      "soportes": [
+        0.7558,
+        0.775,
+        0.7806
+      ],
+      "resistencias": [
+        0.7415,
+        0.7354,
+        0.7276
+      ],
+      "contexto_sr": {
+        "influencia": null,
+        "nivel": null,
+        "precio": 0.7439,
+        "soportes": [
+          0.7558,
+          0.775,
+          0.7806
+        ],
+        "resistencias": [
+          0.7415,
+          0.7354,
+          0.7276
+        ]
+      },
+      "horizonte": "24h",
+      "pesos_aplicados": {
+        "rsi": 1.0,
+        "macd": 1.0,
+        "sma": 1.0,
+        "soportes_resistencias": 1.0,
+        "sharpe": 1.0
+      }
+    },
+    "timestamp": 1754322858.4266658,
+    "created_at": "2025-08-04T12:54:18.426671"
+  },
+  "SANDUSDT_24h": {
+    "data": {
+      "symbol": "SANDUSDT",
+      "recomendacion": "Mantener",
+      "puntaje_total": 2.0,
+      "motivo": [
+        "🧠 Usando pesos optimizados por aprendizaje automático",
+        "MACD alcista [peso: 1.0]",
+        "SMA 7 > SMA 21 [peso: 1.0]",
+        "Sharpe negativo [peso: 1.0]"
+      ],
+      "indicadores": {
+        "rsi": 59.46,
+        "sma_7": 0.2678,
+        "sma_21": 0.2668,
+        "sma_50": 0.2635,
+        "sma_200": 0.2843,
+        "macd": 0.0012,
+        "macd_signal": 0.001,
+        "macd_hist": 0.0002,
+        "bb_upper": 0.2702,
+        "bb_mid": 0.2669,
+        "bb_lower": 0.2636,
+        "obv": -21255126.0,
+        "vwap": 0.2854,
+        "sharpe_ratio": -1.4375,
+        "fg_index": 64,
+        "noticias_score": 0
+      },
+      "soportes": [
+        0.2608,
+        0.2826,
+        0.284
+      ],
+      "resistencias": [
+        0.2699,
+        0.2712,
+        0.2662
+      ],
+      "contexto_sr": {
+        "influencia": null,
+        "nivel": null,
+        "precio": 0.2699,
+        "soportes": [
+          0.2608,
+          0.2826,
+          0.284
+        ],
+        "resistencias": [
+          0.2699,
+          0.2712,
+          0.2662
+        ]
+      },
+      "horizonte": "24h",
+      "pesos_aplicados": {
+        "rsi": 1.0,
+        "macd": 1.0,
+        "sma": 1.0,
+        "soportes_resistencias": 1.0,
+        "sharpe": 1.0
+      }
+    },
+    "timestamp": 1754322858.5054727,
+    "created_at": "2025-08-04T12:54:18.505477"
+  },
+  "THETAUSDT_24h": {
+    "data": {
+      "symbol": "THETAUSDT",
+      "recomendacion": "Mantener",
+      "puntaje_total": 2.0,
+      "motivo": [
+        "🧠 Usando pesos optimizados por aprendizaje automático",
+        "MACD alcista [peso: 1.0]",
+        "SMA 7 > SMA 21 [peso: 1.0]",
+        "Sharpe negativo [peso: 1.0]"
+      ],
+      "indicadores": {
+        "rsi": 69.77,
+        "sma_7": 0.7586,
+        "sma_21": 0.754,
+        "sma_50": 0.7445,
+        "sma_200": 0.8167,
+        "macd": 0.0044,
+        "macd_signal": 0.003,
+        "macd_hist": 0.0015,
+        "bb_upper": 0.7672,
+        "bb_mid": 0.7543,
+        "bb_lower": 0.7415,
+        "obv": -10562928.3,
+        "vwap": 0.8217,
+        "sharpe_ratio": -1.1932,
+        "fg_index": 64,
+        "noticias_score": 0
+      },
+      "soportes": [
+        0.819,
+        0.714,
+        0.84
+      ],
+      "resistencias": [
+        0.763,
+        0.752,
+        0.745
+      ],
+      "contexto_sr": {
+        "influencia": null,
+        "nivel": null,
+        "precio": 0.769,
+        "soportes": [
+          0.819,
+          0.714,
+          0.84
+        ],
+        "resistencias": [
+          0.763,
+          0.752,
+          0.745
+        ]
+      },
+      "horizonte": "24h",
+      "pesos_aplicados": {
+        "rsi": 1.0,
+        "macd": 1.0,
+        "sma": 1.0,
+        "soportes_resistencias": 1.0,
+        "sharpe": 1.0
+      }
+    },
+    "timestamp": 1754322862.2017198,
+    "created_at": "2025-08-04T12:54:22.201725"
+  },
+  "MANAUSDT_24h": {
+    "data": {
+      "symbol": "MANAUSDT",
+      "recomendacion": "Mantener",
+      "puntaje_total": 2.0,
+      "motivo": [
+        "🧠 Usando pesos optimizados por aprendizaje automático",
+        "MACD alcista [peso: 1.0]",
+        "SMA 7 > SMA 21 [peso: 1.0]",
+        "Sharpe negativo [peso: 1.0]"
+      ],
+      "indicadores": {
+        "rsi": 59.38,
+        "sma_7": 0.2815,
+        "sma_21": 0.2802,
+        "sma_50": 0.2753,
+        "sma_200": 0.2925,
+        "macd": 0.0018,
+        "macd_signal": 0.0016,
+        "macd_hist": 0.0001,
+        "bb_upper": 0.2842,
+        "bb_mid": 0.2803,
+        "bb_lower": 0.2765,
+        "obv": -12553388.0,
+        "vwap": 0.2938,
+        "sharpe_ratio": -1.3202,
+        "fg_index": 64,
+        "noticias_score": 0
+      },
+      "soportes": [
+        0.2883,
+        0.2902,
+        0.2703
+      ],
+      "resistencias": [
+        0.2832,
+        0.2775,
+        0.2773
+      ],
+      "contexto_sr": {
+        "influencia": null,
+        "nivel": null,
+        "precio": 0.2836,
+        "soportes": [
+          0.2883,
+          0.2902,
+          0.2703
+        ],
+        "resistencias": [
+          0.2832,
+          0.2775,
+          0.2773
+        ]
+      },
+      "horizonte": "24h",
+      "pesos_aplicados": {
+        "rsi": 1.0,
+        "macd": 1.0,
+        "sma": 1.0,
+        "soportes_resistencias": 1.0,
+        "sharpe": 1.0
+      }
+    },
+    "timestamp": 1754322867.2375944,
+    "created_at": "2025-08-04T12:54:27.237597"
+  },
+  "SUSDT_24h": {
+    "data": {
+      "symbol": "SUSDT",
+      "recomendacion": "Mantener",
+      "puntaje_total": -1.0,
+      "motivo": [
+        "🧠 Usando pesos optimizados por aprendizaje automático",
+        "MACD alcista [peso: 1.0]",
+        "SMA 7 < SMA 21 [peso: 1.0]",
+        "Sharpe negativo [peso: 1.0]"
+      ],
+      "indicadores": {
+        "rsi": 46.94,
+        "sma_7": 0.2983,
+        "sma_21": 0.301,
+        "sma_50": 0.2976,
+        "sma_200": 0.3122,
+        "macd": -0.0,
+        "macd_signal": -0.0,
+        "macd_hist": 0.0,
+        "bb_upper": 0.3082,
+        "bb_mid": 0.301,
+        "bb_lower": 0.2938,
+        "obv": -74121590.3,
+        "vwap": 0.3147,
+        "sharpe_ratio": -0.8997,
+        "fg_index": 64,
+        "noticias_score": 0
+      },
+      "soportes": [
+        0.3038,
+        0.3053,
+        0.2978
+      ],
+      "resistencias": [
+        0.3034,
+        0.297,
+        0.3076
+      ],
+      "contexto_sr": {
+        "influencia": null,
+        "nivel": null,
+        "precio": 0.3021,
+        "soportes": [
+          0.3038,
+          0.3053,
+          0.2978
+        ],
+        "resistencias": [
+          0.3034,
+          0.297,
+          0.3076
+        ]
+      },
+      "horizonte": "24h",
+      "pesos_aplicados": {
+        "rsi": 1.0,
+        "macd": 1.0,
+        "sma": 1.0,
+        "soportes_resistencias": 1.0,
+        "sharpe": 1.0
+      }
+    },
+    "timestamp": 1754322921.3331022,
+    "created_at": "2025-08-04T12:55:21.333107"
+  }
+}

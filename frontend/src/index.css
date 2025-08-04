@@ -1,0 +1,208 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #0f0f23;
+  color: white;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Estilos básicos para el dashboard */
+.dashboard {
+  min-height: 100vh;
+  padding: 24px;
+  background-color: #0f0f23;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-controls span {
+  color: #9ca3af;
+}
+
+.header-controls select {
+  background-color: #1a1a2e;
+  border: 1px solid #2d2d44;
+  border-radius: 8px;
+  padding: 4px 12px;
+  color: white;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 24px;
+}
+
+.ticker-input {
+  background-color: #1a1a2e;
+  border: 1px solid #2d2d44;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.ticker-input form {
+  display: flex;
+  gap: 8px;
+}
+
+.ticker-input input {
+  flex: 1;
+  background-color: #0f0f23;
+  border: 1px solid #2d2d44;
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: white;
+}
+
+.ticker-input input:focus {
+  outline: none;
+  border-color: #00ff88;
+}
+
+.ticker-input button {
+  background-color: #00ff88;
+  color: black;
+  padding: 8px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.ticker-input button:hover {
+  background-color: #00cc6a;
+}
+
+.ticker-input button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ticker-card {
+  background-color: #1a1a2e;
+  border: 1px solid #2d2d44;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ticker-card:hover {
+  border-color: #00ff88;
+  transform: scale(1.02);
+}
+
+.ticker-card.selected {
+  border-color: #00ff88;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+}
+
+.ticker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ticker-symbol {
+  font-size: 1.125rem;
+  font-weight: bold;
+}
+
+.recommendation-badge {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.recommendation-buy {
+  background-color: #00ff88;
+  color: black;
+}
+
+.recommendation-sell {
+  background-color: #ff4444;
+  color: white;
+}
+
+.recommendation-hold {
+  background-color: #ffaa00;
+  color: black;
+}
+
+.ticker-price {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.price-change {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.price-change.positive {
+  color: #00ff88;
+}
+
+.price-change.negative {
+  color: #ff4444;
+}
+
+.chart-container {
+  background-color: #1a1a2e;
+  border: 1px solid #2d2d44;
+  border-radius: 8px;
+  padding: 24px;
+  height: 384px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state {
+  text-align: center;
+  color: #9ca3af;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

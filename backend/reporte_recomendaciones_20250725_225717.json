@@ -1,0 +1,69 @@
+{
+  "metadata": {
+    "fecha_exportacion": "2025-07-25T22:57:17.349993",
+    "total_recomendaciones": 2,
+    "total_optimizaciones": 2
+  },
+  "recomendaciones": [
+    {
+      "fecha": "2025-07-25T22:23:01.248538",
+      "simbolo": "BTCUSDT",
+      "recomendacion": "comprar",
+      "precio_recomendacion": 45000.0,
+      "resultado": null,
+      "precision": null,
+      "pesos_utilizados": {
+        "rsi": 0.25,
+        "macd": 0.3,
+        "soportes_resistencias": 0.45
+      }
+    },
+    {
+      "fecha": "2025-07-25T22:57:11.136576",
+      "simbolo": "BTCUSDT",
+      "recomendacion": "comprar",
+      "precio_recomendacion": 45000.0,
+      "resultado": "exitoso",
+      "precision": 1.0,
+      "pesos_utilizados": {
+        "rsi": 0.25,
+        "macd": 0.3,
+        "soportes_resistencias": 0.45
+      }
+    }
+  ],
+  "optimizaciones": [
+    {
+      "fecha": "2025-07-25T22:23:09.245627",
+      "tipo": "pesos",
+      "descripcion": "Ajuste de pesos basado en análisis de soportes y resistencias",
+      "pesos_anteriores": {
+        "rsi": 0.3,
+        "macd": 0.35,
+        "soportes_resistencias": 0.35
+      },
+      "pesos_nuevos": {
+        "rsi": 0.25,
+        "macd": 0.3,
+        "soportes_resistencias": 0.45
+      },
+      "motivo_ajuste": "Mejora en precisión de soportes y resistencias"
+    },
+    {
+      "fecha": "2025-07-25T22:57:13.195731",
+      "tipo": "pesos",
+      "descripcion": "Ajuste de pesos basado en análisis de soportes y resistencias",
+      "pesos_anteriores": {
+        "rsi": 0.3,
+        "macd": 0.35,
+        "soportes_resistencias": 0.35
+      },
+      "pesos_nuevos": {
+        "rsi": 0.25,
+        "macd": 0.3,
+        "soportes_resistencias": 0.45
+      },
+      "motivo_ajuste": "Mejora en precisión de soportes y resistencias"
+    }
+  ]
+}
