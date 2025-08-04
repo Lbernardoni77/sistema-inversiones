@@ -23,31 +23,7 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data')
 SIGNALS_FILE = os.path.join(DATA_DIR, 'signals.csv')
 
 def get_binance_price(symbol: str, period: str = "1d") -> dict:
-    # Mapeo de símbolos de Binance a CoinGecko
-    symbol_mapping = {
-        'BTCUSDT': 'bitcoin',
-        'ETHUSDT': 'ethereum',
-        'BNBUSDT': 'binancecoin',
-        'ADAUSDT': 'cardano',
-        'DOTUSDT': 'polkadot',
-        'LINKUSDT': 'chainlink',
-        'LTCUSDT': 'litecoin',
-        'BCHUSDT': 'bitcoin-cash',
-        'XRPUSDT': 'ripple',
-        'SOLUSDT': 'solana',
-        'MATICUSDT': 'matic-network',
-        'AVAXUSDT': 'avalanche-2',
-        'UNIUSDT': 'uniswap',
-        'ATOMUSDT': 'cosmos',
-        'FTMUSDT': 'fantom',
-        'NEARUSDT': 'near',
-        'ALGOUSDT': 'algorand',
-        'VETUSDT': 'vechain',
-        'ICPUSDT': 'internet-computer',
-        'FILUSDT': 'filecoin'
-    }
-    
-    # Intentar primero con Binance
+    # Intentar primero con Binance (con API keys)
     url = f"{BINANCE_API_URL}?symbol={symbol.upper()}"
     headers = {}
     if BINANCE_API_KEY:
@@ -65,6 +41,31 @@ def get_binance_price(symbol: str, period: str = "1d") -> dict:
     except Exception as e:
         # Si Binance falla, usar CoinGecko como fallback
         print(f"Binance falló para {symbol}, usando CoinGecko: {e}")
+        
+        # Mapeo de símbolos de Binance a CoinGecko
+        symbol_mapping = {
+            'BTCUSDT': 'bitcoin',
+            'ETHUSDT': 'ethereum',
+            'BNBUSDT': 'binancecoin',
+            'ADAUSDT': 'cardano',
+            'DOTUSDT': 'polkadot',
+            'LINKUSDT': 'chainlink',
+            'LTCUSDT': 'litecoin',
+            'BCHUSDT': 'bitcoin-cash',
+            'XRPUSDT': 'ripple',
+            'SOLUSDT': 'solana',
+            'MATICUSDT': 'matic-network',
+            'AVAXUSDT': 'avalanche-2',
+            'UNIUSDT': 'uniswap',
+            'ATOMUSDT': 'cosmos',
+            'FTMUSDT': 'fantom',
+            'NEARUSDT': 'near',
+            'ALGOUSDT': 'algorand',
+            'VETUSDT': 'vechain',
+            'ICPUSDT': 'internet-computer',
+            'FILUSDT': 'filecoin'
+        }
+        
         return get_coingecko_price(symbol, symbol_mapping, period)
 
 def get_coingecko_price(symbol: str, symbol_mapping: dict, period: str = "1d") -> dict:
