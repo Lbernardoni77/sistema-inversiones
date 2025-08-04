@@ -15,6 +15,10 @@ BINANCE_KLINES_URL = "https://api.binance.com/api/v3/klines"
 # API alternativa sin restricciones
 COINGECKO_API_URL = "https://api.coingecko.com/api/v3"
 
+# Cache simple para precios
+price_cache = {}
+cache_duration = 60  # 60 segundos
+
 DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data')
 SIGNALS_FILE = os.path.join(DATA_DIR, 'signals.csv')
 
@@ -71,9 +75,27 @@ def get_coingecko_price(symbol: str, symbol_mapping: dict, period: str = "1d") -
         if not coingecko_id:
             return {"error": f"Símbolo {symbol} no soportado en CoinGecko"}
         
+        # Verificar cache
+        import time
+        current_time = time.time()
+        cache_key = f"{symbol}_{period}"
+        
+        if cache_key in price_cache:
+            cached_data, cache_time = price_cache[cache_key]
+            if current_time - cache_time < cache_duration:
+                return cached_data
+        
+        # Agregar delay para evitar rate limiting
+        time.sleep(1)
+        
         # Obtener precio actual
         url = f"{COINGECKO_API_URL}/simple/price?ids={coingecko_id}&vs_currencies=usd&include_24hr_change=true"
         response = httpx.get(url, timeout=10)
+        
+        # Manejar rate limiting
+        if response.status_code == 429:
+            return {"error": "Rate limit alcanzado. Intenta nuevamente en unos minutos."}
+        
         response.raise_for_status()
         data = response.json()
         
@@ -84,13 +106,18 @@ def get_coingecko_price(symbol: str, symbol_mapping: dict, period: str = "1d") -
         price_actual = price_data.get('usd', 0)
         change_24h = price_data.get('usd_24h_change', 0)
         
-        return {
+        result = {
             "symbol": symbol.upper(),
             "price": price_actual,
             "change_percent": change_24h,
             "period": period,
             "source": "coingecko"
         }
+        
+        # Guardar en cache
+        price_cache[cache_key] = (result, current_time)
+        
+        return result
         
     except Exception as e:
         return {"error": f"Error obteniendo precio de CoinGecko: {str(e)}"}
