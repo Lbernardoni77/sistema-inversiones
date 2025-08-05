@@ -150,11 +150,23 @@ function Dashboard() {
       try {
         recommendation = await apiService.getTickerRecommendation(symbol, selectedHorizon);
         price = await apiService.getTickerPrice(symbol, period);
+        
+        // Debug: Log de la respuesta del precio
+        console.log('Respuesta del precio:', price);
+        console.log('Tipo de price.price:', typeof price.price);
+        console.log('Valor de price.price:', price.price);
+        
       } catch (err) {
+        console.error('Error al obtener datos:', err);
         alert(`No se encontró el ticker "${symbol}".\nVerifica el nombre e intenta nuevamente.`);
         return;
       }
-      if (!price || typeof price.price !== 'number') {
+      
+      // Convertir el precio a número si es necesario
+      const precioNumerico = typeof price.price === 'string' ? parseFloat(String(price.price).replace(',', '.')) : price.price;
+      
+      if (!price || typeof precioNumerico !== 'number' || isNaN(precioNumerico)) {
+        console.error('Precio inválido:', price);
         alert(`No se pudo obtener el precio para "${symbol}".\nVerifica el nombre e intenta nuevamente.`);
         return;
       }
@@ -175,7 +187,7 @@ function Dashboard() {
       
       const newTicker: TickerData = {
         symbol,
-        price: price.price,
+        price: precioNumerico,
         recommendation: recomendacion,
         priceChange: price.change_percent ?? 0,
         lastUpdate: new Date(),
