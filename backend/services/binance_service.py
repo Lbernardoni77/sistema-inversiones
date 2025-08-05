@@ -29,22 +29,6 @@ SIGNALS_FILE = os.path.join(DATA_DIR, 'signals.csv')
 
 def get_httpx_client():
     """Crear cliente HTTP con configuración de proxy si está disponible"""
-    proxies = None
-    if PROXY_URL:
-        if PROXY_USERNAME and PROXY_PASSWORD:
-            # Proxy con autenticación
-            proxy_auth = f"{PROXY_USERNAME}:{PROXY_PASSWORD}"
-            proxies = {
-                "http://": f"http://{proxy_auth}@{PROXY_URL.replace('http://', '')}",
-                "https://": f"http://{proxy_auth}@{PROXY_URL.replace('http://', '')}"
-            }
-        else:
-            # Proxy sin autenticación
-            proxies = {
-                "http://": PROXY_URL,
-                "https://": PROXY_URL
-            }
-    
     # Headers mejorados para sortear restricciones
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -57,7 +41,19 @@ def get_httpx_client():
         'Sec-Fetch-Site': 'same-site'
     }
     
-    return httpx.Client(proxies=proxies, timeout=15, headers=headers)
+    # Configurar proxy si está disponible (usando el método correcto para httpx)
+    if PROXY_URL:
+        if PROXY_USERNAME and PROXY_PASSWORD:
+            # Proxy con autenticación
+            proxy_auth = f"{PROXY_USERNAME}:{PROXY_PASSWORD}"
+            proxy_url = f"http://{proxy_auth}@{PROXY_URL.replace('http://', '')}"
+        else:
+            # Proxy sin autenticación
+            proxy_url = PROXY_URL
+        
+        return httpx.Client(proxies=proxy_url, timeout=15, headers=headers)
+    else:
+        return httpx.Client(timeout=15, headers=headers)
 
 def get_binance_price(symbol: str, period: str = "1d") -> dict:
     # Intentar primero con Binance (con API keys y proxy si está configurado)
