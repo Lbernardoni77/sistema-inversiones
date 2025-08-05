@@ -17,7 +17,7 @@ COINGECKO_API_URL = "https://api.coingecko.com/api/v3"
 
 # Cache simple para precios
 price_cache = {}
-cache_duration = 60  # 60 segundos
+cache_duration = 300  # 5 minutos (aumentado de 60 segundos)
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data')
 SIGNALS_FILE = os.path.join(DATA_DIR, 'signals.csv')
@@ -127,7 +127,7 @@ def get_coingecko_price(symbol: str, symbol_mapping: dict, period: str = "1d") -
                 return cached_data
         
         # Agregar delay para evitar rate limiting
-        time.sleep(1)
+        time.sleep(2)  # Aumentado de 1 a 2 segundos
         
         # Obtener precio actual
         url = f"{COINGECKO_API_URL}/simple/price?ids={coingecko_id}&vs_currencies=usd&include_24hr_change=true"
@@ -135,6 +135,12 @@ def get_coingecko_price(symbol: str, symbol_mapping: dict, period: str = "1d") -
         
         # Manejar rate limiting
         if response.status_code == 429:
+            # Intentar usar cache si está disponible
+            if cache_key in price_cache:
+                cached_data, cache_time = price_cache[cache_key]
+                if current_time - cache_time < cache_duration * 2:  # Usar cache por más tiempo si hay rate limit
+                    print(f"Rate limit alcanzado, usando cache para {symbol}")
+                    return cached_data
             return {"error": "Rate limit alcanzado. Intenta nuevamente en unos minutos."}
         
         response.raise_for_status()
