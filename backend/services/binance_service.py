@@ -145,8 +145,6 @@ def get_coingecko_price(symbol: str, symbol_mapping: dict, period: str = "1d") -
             # Fallback a datos estáticos si no hay cache
             print(f"Rate limit alcanzado para {symbol}, usando fallback estático")
             return get_static_price_fallback(symbol, period)
-            
-        return {"error": "Rate limit alcanzado. Intenta nuevamente en unos minutos."}
         
         response.raise_for_status()
         data = response.json()
