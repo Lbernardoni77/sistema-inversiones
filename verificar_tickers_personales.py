@@ -1,156 +1,165 @@
 #!/usr/bin/env python3
 """
-Script para verificar los tickers que el usuario cargó manualmente en el frontend
+Script para verificar que los tickers personales estén funcionando correctamente
 """
-import sqlite3
+
+import requests
 import json
-import os
+import time
 
-def verificar_tickers_personales():
-    print("🔍 VERIFICANDO TICKERS PERSONALES DEL FRONTEND")
-    print("=" * 60)
-    
-    # Verificar si hay archivos de localStorage o configuración
-    print("📁 Buscando archivos de configuración del frontend...")
-    
-    # Buscar en el directorio frontend
-    frontend_dir = "frontend"
-    if os.path.exists(frontend_dir):
-        print(f"✅ Directorio frontend encontrado")
-        
-        # Buscar archivos de configuración
-        config_files = []
-        for root, dirs, files in os.walk(frontend_dir):
-            for file in files:
-                if any(keyword in file.lower() for keyword in ['config', 'ticker', 'watchlist', 'default']):
-                    config_files.append(os.path.join(root, file))
-        
-        if config_files:
-            print(f"📋 Archivos de configuración encontrados:")
-            for file in config_files:
-                print(f"   • {file}")
-        else:
-            print("⚠️ No se encontraron archivos de configuración específicos")
-    
-    # Verificar la base de datos del backend
-    print(f"\n📊 VERIFICANDO BASE DE DATOS DEL BACKEND")
-    print("-" * 40)
-    
+# URLs de los servicios
+BACKEND_URL = "https://sistema-inversiones.onrender.com"
+FRONTEND_URL = "https://sistema-inversiones-frontend.onrender.com"
+
+# Tickers que el usuario ha estado probando
+TICKERS_PERSONALES = [
+    "BTCUSDT", "ETHUSDT", "ADAUSDT", "DOTUSDT", 
+    "SANDUSDT", "THETAUSDT", "MANAUSDT", "SHIBUSDT"
+]
+
+def verificar_backend():
+    """Verificar que el backend esté funcionando"""
+    print("🔍 Verificando backend...")
     try:
-        conn = sqlite3.connect('backend/data/inversiones.db')
-        cursor = conn.cursor()
-        
-        # Obtener todos los tickers
-        cursor.execute("SELECT symbol, created_at FROM tickers ORDER BY created_at")
-        tickers_bd = cursor.fetchall()
-        
-        print(f"📋 Total tickers en BD: {len(tickers_bd)}")
-        
-        # Separar por fecha de creación
-        tickers_originales = []
-        tickers_agregados_script1 = []
-        tickers_agregados_script2 = []
-        
-        for symbol, created_at in tickers_bd:
-            if created_at.startswith('2025-07-22'):
-                tickers_originales.append(symbol)
-            elif created_at.startswith('2025-07-28') and '16:' in created_at:
-                tickers_agregados_script1.append(symbol)
-            elif created_at.startswith('2025-07-28') and '17:' in created_at:
-                tickers_agregados_script2.append(symbol)
-        
-        print(f"\n📅 Tickers originales (22 de julio):")
-        for ticker in tickers_originales:
-            print(f"   • {ticker}")
-        
-        print(f"\n📅 Tickers agregados por primer script:")
-        for ticker in tickers_agregados_script1:
-            print(f"   • {ticker}")
-        
-        print(f"\n📅 Tickers agregados por segundo script:")
-        for ticker in tickers_agregados_script2:
-            print(f"   • {ticker}")
-        
-        conn.close()
-        
-    except Exception as e:
-        print(f"❌ Error verificando BD: {e}")
-
-def verificar_frontend_localStorage():
-    print(f"\n🌐 VERIFICANDO FRONTEND (localStorage)")
-    print("=" * 60)
-    
-    print("💡 Para verificar tus tickers personales del frontend:")
-    print("   1. Abre el navegador")
-    print("   2. Ve a http://localhost:3000")
-    print("   3. Abre las herramientas de desarrollador (F12)")
-    print("   4. Ve a la pestaña 'Application' o 'Aplicación'")
-    print("   5. En el panel izquierdo, busca 'Local Storage'")
-    print("   6. Haz clic en 'http://localhost:3000'")
-    print("   7. Busca la clave 'tickers'")
-    print("   8. Copia el valor JSON y compártelo aquí")
-    
-    print(f"\n📋 Alternativamente, puedes:")
-    print("   - Abrir la consola del navegador (F12)")
-    print("   - Ejecutar: console.log(localStorage.getItem('tickers'))")
-    print("   - Copiar el resultado")
-
-def verificar_endpoint_tickers():
-    print(f"\n🌐 VERIFICANDO ENDPOINT DE TICKERS")
-    print("=" * 50)
-    
-    try:
-        import requests
-        response = requests.get("http://localhost:8000/tickers/list", timeout=5)
-        
+        response = requests.get(f"{BACKEND_URL}/healthz", timeout=10)
         if response.status_code == 200:
-            tickers_api = response.json()
-            print("✅ Endpoint responde correctamente")
-            print(f"📋 Tickers en API: {tickers_api}")
+            print("✅ Backend funcionando correctamente")
+            return True
         else:
-            print(f"❌ Error en endpoint: {response.status_code}")
-            
+            print(f"❌ Backend respondió con código {response.status_code}")
+            return False
     except Exception as e:
-        print(f"❌ Error consultando endpoint: {e}")
+        print(f"❌ Error conectando al backend: {e}")
+        return False
 
-def comparar_tickers():
-    print(f"\n🔄 COMPARANDO TICKERS")
-    print("=" * 50)
+def verificar_frontend():
+    """Verificar que el frontend esté funcionando"""
+    print("🔍 Verificando frontend...")
+    try:
+        response = requests.get(FRONTEND_URL, timeout=10)
+        if response.status_code == 200:
+            print("✅ Frontend funcionando correctamente")
+            return True
+        else:
+            print(f"❌ Frontend respondió con código {response.status_code}")
+            return False
+    except Exception as e:
+        print(f"❌ Error conectando al frontend: {e}")
+        return False
+
+def probar_ticker(symbol):
+    """Probar un ticker específico"""
+    print(f"\n🔍 Probando {symbol}...")
     
-    print("📊 Resumen:")
-    print("   • Los tickers que agregaste manualmente en el frontend")
-    print("     están guardados en localStorage del navegador")
-    print("   • Los tickers en la base de datos del backend")
-    print("     son los que procesan los jobs automáticamente")
-    print()
-    print("💡 Recomendación:")
-    print("   Si quieres que tus tickers personales también se procesen")
-    print("   automáticamente, deberías agregarlos a la base de datos")
-    print("   usando el endpoint: POST /tickers/add")
+    # Probar endpoint de precio
+    try:
+        response = requests.get(f"{BACKEND_URL}/binance/price/{symbol}?period=1d", timeout=15)
+        if response.status_code == 200:
+            data = response.json()
+            print(f"✅ Precio obtenido: ${data.get('price', 'N/A')} ({data.get('source', 'N/A')})")
+            
+            # Verificar formato del precio
+            price = data.get('price')
+            if isinstance(price, (int, float)):
+                print(f"✅ Precio es numérico: {price}")
+            elif isinstance(price, str):
+                print(f"⚠️  Precio es string: {price}")
+                # Intentar convertir
+                try:
+                    precio_numerico = float(price.replace(',', '.'))
+                    print(f"✅ Conversión exitosa: {precio_numerico}")
+                except:
+                    print(f"❌ No se pudo convertir el precio")
+            else:
+                print(f"❌ Tipo de precio inesperado: {type(price)}")
+            
+            return True
+        else:
+            print(f"❌ Error obteniendo precio: {response.status_code}")
+            return False
+    except Exception as e:
+        print(f"❌ Error en precio: {e}")
+        return False
+
+def probar_recomendacion(symbol):
+    """Probar endpoint de recomendación"""
+    try:
+        response = requests.get(f"{BACKEND_URL}/binance/recommendation/{symbol}?horizonte=24h", timeout=15)
+        if response.status_code == 200:
+            data = response.json()
+            recomendacion = data.get('recomendacion', 'N/A')
+            print(f"✅ Recomendación: {recomendacion}")
+            
+            # Verificar soportes y resistencias
+            detalle = data.get('detalle', {})
+            soportes = detalle.get('soportes', [])
+            resistencias = detalle.get('resistencias', [])
+            print(f"✅ Soportes: {len(soportes)}, Resistencias: {len(resistencias)}")
+            
+            return True
+        else:
+            print(f"❌ Error obteniendo recomendación: {response.status_code}")
+            return False
+    except Exception as e:
+        print(f"❌ Error en recomendación: {e}")
+        return False
 
 def main():
-    # 1. Verificar archivos de configuración
-    verificar_tickers_personales()
+    """Función principal"""
+    print("🚀 Verificando Sistema de Inversiones")
+    print("=" * 50)
     
-    # 2. Verificar endpoint
-    verificar_endpoint_tickers()
+    # Verificar servicios
+    backend_ok = verificar_backend()
+    frontend_ok = verificar_frontend()
     
-    # 3. Instrucciones para verificar localStorage
-    verificar_frontend_localStorage()
+    if not backend_ok or not frontend_ok:
+        print("\n❌ Los servicios no están funcionando correctamente")
+        return
     
-    # 4. Comparación
-    comparar_tickers()
+    print("\n📊 Probando tickers personales...")
+    print("=" * 50)
     
-    print(f"\n" + "=" * 60)
-    print("🎯 CONCLUSIÓN")
-    print("=" * 60)
-    print("📊 Tickers en BD (procesados automáticamente): 51")
-    print("📱 Tickers en frontend (localStorage): Necesitas verificar")
-    print()
-    print("💡 Para sincronizar:")
-    print("   1. Verifica qué tickers tienes en el frontend")
-    print("   2. Si faltan en la BD, agrégalos con el endpoint")
-    print("   3. O compárteme la lista y los agrego automáticamente")
+    resultados = {}
+    
+    for ticker in TICKERS_PERSONALES:
+        print(f"\n🎯 {ticker}")
+        print("-" * 30)
+        
+        precio_ok = probar_ticker(ticker)
+        recomendacion_ok = probar_recomendacion(ticker)
+        
+        resultados[ticker] = {
+            'precio': precio_ok,
+            'recomendacion': recomendacion_ok,
+            'total': precio_ok and recomendacion_ok
+        }
+        
+        # Pausa entre requests para evitar rate limiting
+        time.sleep(1)
+    
+    # Resumen
+    print("\n" + "=" * 50)
+    print("📋 RESUMEN DE RESULTADOS")
+    print("=" * 50)
+    
+    exitosos = 0
+    total = len(TICKERS_PERSONALES)
+    
+    for ticker, resultado in resultados.items():
+        status = "✅" if resultado['total'] else "❌"
+        print(f"{status} {ticker}: Precio={resultado['precio']}, Recomendación={resultado['recomendacion']}")
+        if resultado['total']:
+            exitosos += 1
+    
+    print(f"\n📊 Resultado final: {exitosos}/{total} tickers funcionando correctamente")
+    
+    if exitosos == total:
+        print("🎉 ¡Todos los tickers están funcionando perfectamente!")
+        print("💡 El frontend debería poder agregar tickers sin problemas")
+    else:
+        print("⚠️  Algunos tickers tienen problemas")
+        print("💡 Revisa los logs para más detalles")
 
 if __name__ == "__main__":
     main() 

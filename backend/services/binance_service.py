@@ -8,6 +8,11 @@ import os
 BINANCE_API_KEY = os.getenv('BINANCE_API_KEY')
 BINANCE_SECRET_KEY = os.getenv('BINANCE_SECRET_KEY')
 
+# Configuración de proxy para sortear error 451
+PROXY_URL = os.getenv('PROXY_URL')  # ej: "http://proxy-server:port"
+PROXY_USERNAME = os.getenv('PROXY_USERNAME')
+PROXY_PASSWORD = os.getenv('PROXY_PASSWORD')
+
 # URLs de APIs
 BINANCE_API_URL = "https://api.binance.com/api/v3/ticker/price"
 BINANCE_KLINES_URL = "https://api.binance.com/api/v3/klines"
@@ -22,21 +27,55 @@ cache_duration = 300  # 5 minutos (aumentado de 60 segundos)
 DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data')
 SIGNALS_FILE = os.path.join(DATA_DIR, 'signals.csv')
 
+def get_httpx_client():
+    """Crear cliente HTTP con configuración de proxy si está disponible"""
+    proxies = None
+    if PROXY_URL:
+        if PROXY_USERNAME and PROXY_PASSWORD:
+            # Proxy con autenticación
+            proxy_auth = f"{PROXY_USERNAME}:{PROXY_PASSWORD}"
+            proxies = {
+                "http://": f"http://{proxy_auth}@{PROXY_URL.replace('http://', '')}",
+                "https://": f"http://{proxy_auth}@{PROXY_URL.replace('http://', '')}"
+            }
+        else:
+            # Proxy sin autenticación
+            proxies = {
+                "http://": PROXY_URL,
+                "https://": PROXY_URL
+            }
+    
+    # Headers mejorados para sortear restricciones
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-site'
+    }
+    
+    return httpx.Client(proxies=proxies, timeout=15, headers=headers)
+
 def get_binance_price(symbol: str, period: str = "1d") -> dict:
-    # Intentar primero con Binance (con API keys)
+    # Intentar primero con Binance (con API keys y proxy si está configurado)
     url = f"{BINANCE_API_URL}?symbol={symbol.upper()}"
     headers = {}
     if BINANCE_API_KEY:
         headers['X-MBX-APIKEY'] = BINANCE_API_KEY
     
     try:
-        response = httpx.get(url, headers=headers, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-        price_actual = float(data["price"])
-        
-        # Continuar con el resto de la lógica de Binance...
-        return process_binance_data(symbol, price_actual, period)
+        # Usar cliente HTTP con proxy si está configurado
+        with get_httpx_client() as client:
+            response = client.get(url, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            price_actual = float(data["price"])
+            
+            # Continuar con el resto de la lógica de Binance...
+            return process_binance_data(symbol, price_actual, period)
         
     except Exception as e:
         # Si Binance falla, usar CoinGecko como fallback
@@ -352,10 +391,12 @@ def get_binance_klines(symbol: str, interval: str = "1h", limit: int = 200) -> L
         headers['X-MBX-APIKEY'] = BINANCE_API_KEY
     
     try:
-        response = httpx.get(url, headers=headers, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-        return data
+        # Usar cliente HTTP con proxy si está configurado
+        with get_httpx_client() as client:
+            response = client.get(url, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            return data
     except Exception as e:
         return []
 
