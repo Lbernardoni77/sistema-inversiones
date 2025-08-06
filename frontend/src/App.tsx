@@ -17,6 +17,7 @@ interface TickerData {
   priceChange: number;
   lastUpdate: Date;
   previousPrice?: number;
+  hasData?: boolean; // Indica si hay datos reales disponibles
 }
 
 // Definir función para calcular el limit según rango e intervalo
@@ -158,7 +159,17 @@ function Dashboard() {
         
       } catch (err) {
         console.error('Error al obtener datos:', err);
-        alert(`No se encontró el ticker "${symbol}".\nVerifica el nombre e intenta nuevamente.`);
+        // En lugar de mostrar alert, agregar el ticker sin datos
+        const newTicker: TickerData = {
+          symbol,
+          price: 0,
+          recommendation: 'Sin datos',
+          priceChange: 0,
+          lastUpdate: new Date(),
+          hasData: false, // Marcar que no hay datos disponibles
+        };
+        setTickers(prev => [...prev, newTicker]);
+        setTickerPeriods(prev => ({ ...prev, [symbol]: period }));
         return;
       }
       
@@ -167,7 +178,17 @@ function Dashboard() {
       
       if (!price || typeof precioNumerico !== 'number' || isNaN(precioNumerico)) {
         console.error('Precio inválido:', price);
-        alert(`No se pudo obtener el precio para "${symbol}".\nVerifica el nombre e intenta nuevamente.`);
+        // En lugar de mostrar alert, agregar el ticker sin datos
+        const newTicker: TickerData = {
+          symbol,
+          price: 0,
+          recommendation: 'Sin datos',
+          priceChange: 0,
+          lastUpdate: new Date(),
+          hasData: false, // Marcar que no hay datos disponibles
+        };
+        setTickers(prev => [...prev, newTicker]);
+        setTickerPeriods(prev => ({ ...prev, [symbol]: period }));
         return;
       }
       
@@ -191,6 +212,7 @@ function Dashboard() {
         recommendation: recomendacion,
         priceChange: price.change_percent ?? 0,
         lastUpdate: new Date(),
+        hasData: true, // Marcar que hay datos disponibles
       };
       setTickers(prev => [...prev, newTicker]);
       setTickerPeriods(prev => ({ ...prev, [symbol]: period }));
@@ -207,11 +229,17 @@ function Dashboard() {
       const price = await apiService.getTickerPrice(symbol, period);
       setTickers(prev => prev.map(t =>
         t.symbol === symbol
-          ? { ...t, price: price.price, priceChange: price.change_percent ?? 0, lastUpdate: new Date() }
+          ? { ...t, price: price.price, priceChange: price.change_percent ?? 0, lastUpdate: new Date(), hasData: true }
           : t
       ));
     } catch (error) {
-      alert(`Error al actualizar el periodo para ${symbol}`);
+      console.error(`Error al actualizar el periodo para ${symbol}:`, error);
+      // Marcar que no hay datos disponibles
+      setTickers(prev => prev.map(t =>
+        t.symbol === symbol
+          ? { ...t, hasData: false, lastUpdate: new Date() }
+          : t
+      ));
     }
   };
 
@@ -230,10 +258,15 @@ function Dashboard() {
           return {
             ...ticker,
             recommendation: newRec.recomendacion,
-            lastUpdate: new Date()
+            lastUpdate: new Date(),
+            hasData: true
           };
         }
-        return ticker;
+        return {
+          ...ticker,
+          hasData: false,
+          lastUpdate: new Date()
+        };
       }));
     } catch (error) {
       console.error('Error al actualizar recomendaciones:', error);
@@ -330,6 +363,7 @@ function Dashboard() {
                     isSelected={false}
                     period={tickerPeriods[ticker.symbol] || '1d'}
                     onPeriodChange={(period) => handlePeriodChange(ticker.symbol, period)}
+                    hasData={ticker.hasData !== false} // true si hasData es true o undefined, false si es false
                   />
                   <button
                     title="Mostrar gráfico"

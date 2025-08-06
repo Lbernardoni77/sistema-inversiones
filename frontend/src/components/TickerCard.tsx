@@ -10,6 +10,7 @@ interface TickerCardProps {
   isSelected: boolean;
   period?: string;
   onPeriodChange?: (period: string) => void;
+  hasData?: boolean; // Nueva prop para indicar si hay datos disponibles
 }
 
 const PERIODS = [
@@ -29,6 +30,7 @@ const TickerCard: React.FC<TickerCardProps> = ({
   isSelected,
   period = '1d',
   onPeriodChange,
+  hasData = true, // Por defecto asumimos que hay datos
 }) => {
   const [showMenu, setShowMenu] = useState(false);
 
@@ -89,9 +91,15 @@ const TickerCard: React.FC<TickerCardProps> = ({
       {/* Primera fila: símbolo y recomendación */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minWidth: 0 }}>
         <h3 className="ticker-symbol" style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{symbol}</h3>
-        <span className={`recommendation-badge ${getRecommendationColor(recommendation)}`} style={{ marginLeft: 8, fontSize: '0.95rem', minWidth: 80, textAlign: 'right' }}>
-          {getRecommendationIcon(recommendation)} {recommendation}
-        </span>
+        {hasData ? (
+          <span className={`recommendation-badge ${getRecommendationColor(recommendation)}`} style={{ marginLeft: 8, fontSize: '0.95rem', minWidth: 80, textAlign: 'right' }}>
+            {getRecommendationIcon(recommendation)} {recommendation}
+          </span>
+        ) : (
+          <span style={{ marginLeft: 8, fontSize: '0.9rem', color: '#888', minWidth: 80, textAlign: 'right' }}>
+            ⚠️ Sin datos
+          </span>
+        )}
         <button 
           className="remove-button" 
           onClick={(e) => {
@@ -105,34 +113,51 @@ const TickerCard: React.FC<TickerCardProps> = ({
         </button>
       </div>
       {/* Segunda fila: precio, porcentaje y periodo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8, minWidth: 0 }}>
-        <div className="ticker-price" style={{ fontSize: '1.1rem', fontWeight: 600, color: 'white', minWidth: 0, flex: 1 }}>{formatPrice(price)}</div>
-        <div className={`price-change ${priceChange >= 0 ? 'positive' : 'negative'}`} style={{ fontWeight: 600, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: 4, minWidth: 0 }}>
-          {formatPriceChange(priceChange)}
-          <span
-            className="period-selector"
-            title="Seleccionar periodo de variación"
-            style={{ cursor: 'pointer', marginLeft: 4, fontWeight: 'bold', userSelect: 'none', color: '#667eea' }}
-            onClick={handlePeriodClick}
-          >
-            📈 {periodLabel}
-          </span>
-          {showMenu && (
-            <div className="period-menu" onClick={e => e.stopPropagation()} style={{ position: 'absolute', background: '#fff', color: '#333', border: '1px solid #ccc', borderRadius: 8, zIndex: 10, marginTop: 30, right: 0, minWidth: 120 }}>
-              {PERIODS.map(p => (
-                <div
-                  key={p.value}
-                  className="period-menu-item"
-                  style={{ padding: '8px 12px', cursor: 'pointer', background: p.value === period ? '#eee' : 'transparent' }}
-                  onClick={() => handleSelectPeriod(p.value)}
-                >
-                  {p.label} <span style={{ fontSize: 12, color: '#888' }}>({p.desc})</span>
-                </div>
-              ))}
-            </div>
-          )}
+      {hasData ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8, minWidth: 0 }}>
+          <div className="ticker-price" style={{ fontSize: '1.1rem', fontWeight: 600, color: 'white', minWidth: 0, flex: 1 }}>{formatPrice(price)}</div>
+          <div className={`price-change ${priceChange >= 0 ? 'positive' : 'negative'}`} style={{ fontWeight: 600, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: 4, minWidth: 0 }}>
+            {formatPriceChange(priceChange)}
+            <span
+              className="period-selector"
+              title="Seleccionar periodo de variación"
+              style={{ cursor: 'pointer', marginLeft: 4, fontWeight: 'bold', userSelect: 'none', color: '#667eea' }}
+              onClick={handlePeriodClick}
+            >
+              📈 {periodLabel}
+            </span>
+            {showMenu && (
+              <div className="period-menu" onClick={e => e.stopPropagation()} style={{ position: 'absolute', background: '#fff', color: '#333', border: '1px solid #ccc', borderRadius: 8, zIndex: 10, marginTop: 30, right: 0, minWidth: 120 }}>
+                {PERIODS.map(p => (
+                  <div
+                    key={p.value}
+                    className="period-menu-item"
+                    style={{ padding: '8px 12px', cursor: 'pointer', background: p.value === period ? '#eee' : 'transparent' }}
+                    onClick={() => handleSelectPeriod(p.value)}
+                  >
+                    {p.label} <span style={{ fontSize: 12, color: '#888' }}>({p.desc})</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          marginTop: 8, 
+          padding: '12px',
+          backgroundColor: '#1a1a1a',
+          borderRadius: '6px',
+          border: '1px solid #333'
+        }}>
+          <span style={{ color: '#888', fontSize: '0.9rem', fontWeight: 500 }}>
+            📊 Datos no disponibles para este ticker
+          </span>
+        </div>
+      )}
     </div>
   );
 };

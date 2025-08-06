@@ -303,8 +303,21 @@ const CandleChart: React.FC<CandleChartProps> = ({ klines, soportes = [], resist
         Hora local de tu dispositivo
       </div>
       {safeKlines.length === 0 && (
-        <div style={{ position: 'absolute', top: 60, left: 0, right: 0, textAlign: 'center', color: '#888', fontWeight: 600 }}>
-          No hay datos disponibles para mostrar el gráfico
+        <div style={{ 
+          position: 'absolute', 
+          top: '50%', 
+          left: '50%', 
+          transform: 'translate(-50%, -50%)', 
+          textAlign: 'center', 
+          color: '#888', 
+          fontWeight: 600,
+          fontSize: '16px',
+          backgroundColor: '#1a1a1a',
+          padding: '20px',
+          borderRadius: '8px',
+          border: '1px solid #333'
+        }}>
+          📊 Datos no disponibles para este ticker
         </div>
       )}
     </div>
