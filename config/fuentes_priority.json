@@ -1,0 +1,75 @@
+{
+  "last_updated": "2025-08-06T16:31:17.596292",
+  "source_order": [
+    "coinmarketcap",
+    "coinpaprika",
+    "yahoo",
+    "cryptocompare",
+    "kraken",
+    "coingecko",
+    "coincap"
+  ],
+  "performance_data": [
+    {
+      "source": "coinmarketcap",
+      "avg_response_time": 0.912846565246582,
+      "success_rate": 1.0,
+      "avg_completeness": 1.0,
+      "total_tests": 5,
+      "successful_tests": 5
+    },
+    {
+      "source": "coinpaprika",
+      "avg_response_time": 0.9524760723114014,
+      "success_rate": 1.0,
+      "avg_completeness": 1.0,
+      "total_tests": 5,
+      "successful_tests": 5
+    },
+    {
+      "source": "yahoo",
+      "avg_response_time": 1.2102104663848876,
+      "success_rate": 1.0,
+      "avg_completeness": 1.0,
+      "total_tests": 5,
+      "successful_tests": 5
+    },
+    {
+      "source": "cryptocompare",
+      "avg_response_time": 1.3296082973480225,
+      "success_rate": 1.0,
+      "avg_completeness": 1.0,
+      "total_tests": 5,
+      "successful_tests": 5
+    },
+    {
+      "source": "kraken",
+      "avg_response_time": 0.7269201278686523,
+      "success_rate": 0.4,
+      "avg_completeness": 1.0,
+      "total_tests": 5,
+      "successful_tests": 2
+    },
+    {
+      "source": "coingecko",
+      "avg_response_time": 5.695260620117187,
+      "success_rate": 0.5,
+      "avg_completeness": 1.0,
+      "total_tests": 10,
+      "successful_tests": 5
+    },
+    {
+      "source": "coincap",
+      "avg_response_time": "inf",
+      "success_rate": 0.0,
+      "avg_completeness": 0.0,
+      "total_tests": 5,
+      "successful_tests": 0
+    }
+  ],
+  "metadata": {
+    "total_sources": 7,
+    "benchmark_timestamp": "2025-08-06T16:31:11.499066",
+    "description": "Configuración actualizada automáticamente"
+  }
+}
