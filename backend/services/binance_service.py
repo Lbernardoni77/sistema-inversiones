@@ -141,7 +141,14 @@ def get_binance_price(symbol: str, period: str = "1d") -> dict:
             'KSMUSDT': 'kusama'
         }
         
-        return get_coingecko_price(symbol, symbol_mapping, period)
+        coingecko_result = get_coingecko_price(symbol, symbol_mapping, period)
+        
+        # Si CoinGecko también falla, devolver error en lugar de fallback estático
+        if "error" in coingecko_result:
+            print(f"No se pudieron obtener datos reales para {symbol} ni de Binance ni de CoinGecko.")
+            return {"error": f"No hay datos disponibles para {symbol}"}
+        
+        return coingecko_result
 
 def get_coingecko_klines(symbol: str, interval: str = "1d", limit: int = 30) -> List[list]:
     """Obtener klines de CoinGecko. Si falla, devolver []."""
@@ -272,9 +279,9 @@ def get_coingecko_price(symbol: str, symbol_mapping: dict, period: str = "1d") -
                     print(f"Rate limit alcanzado, usando cache para {symbol}")
                     return cached_data
             
-            # Fallback a datos estáticos si no hay cache
-            print(f"Rate limit alcanzado para {symbol}, usando fallback estático")
-            return get_static_price_fallback(symbol, period)
+            # Si no hay cache disponible, devolver error
+            print(f"Rate limit alcanzado para {symbol}, no hay datos disponibles")
+            return {"error": f"Rate limit alcanzado para {symbol}"}
         
         response.raise_for_status()
         data = response.json()
