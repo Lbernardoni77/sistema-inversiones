@@ -1,25 +1,25 @@
 {
-  "timestamp": "2025-08-06T16:31:11.499066",
+  "timestamp": "2025-08-07T20:29:24.727745",
   "performance_ranking": [
     {
-      "source": "coinmarketcap",
-      "avg_response_time": 0.912846565246582,
+      "source": "binance",
+      "avg_response_time": 0.7856148242950439,
       "success_rate": 1.0,
       "avg_completeness": 1.0,
-      "total_tests": 5,
-      "successful_tests": 5
-    },
-    {
-      "source": "coinpaprika",
-      "avg_response_time": 0.9524760723114014,
-      "success_rate": 1.0,
-      "avg_completeness": 1.0,
-      "total_tests": 5,
-      "successful_tests": 5
+      "total_tests": 10,
+      "successful_tests": 10
     },
     {
       "source": "yahoo",
-      "avg_response_time": 1.2102104663848876,
+      "avg_response_time": 0.8438262462615966,
+      "success_rate": 1.0,
+      "avg_completeness": 1.0,
+      "total_tests": 5,
+      "successful_tests": 5
+    },
+    {
+      "source": "coinmarketcap",
+      "avg_response_time": 1.1119281768798828,
       "success_rate": 1.0,
       "avg_completeness": 1.0,
       "total_tests": 5,
@@ -27,7 +27,15 @@
     },
     {
       "source": "cryptocompare",
-      "avg_response_time": 1.3296082973480225,
+      "avg_response_time": 1.3375460147857665,
+      "success_rate": 1.0,
+      "avg_completeness": 1.0,
+      "total_tests": 5,
+      "successful_tests": 5
+    },
+    {
+      "source": "coinpaprika",
+      "avg_response_time": 2.7624702930450438,
       "success_rate": 1.0,
       "avg_completeness": 1.0,
       "total_tests": 5,
@@ -35,7 +43,7 @@
     },
     {
       "source": "kraken",
-      "avg_response_time": 0.7269201278686523,
+      "avg_response_time": 0.9045431613922119,
       "success_rate": 0.4,
       "avg_completeness": 1.0,
       "total_tests": 5,
@@ -43,11 +51,11 @@
     },
     {
       "source": "coingecko",
-      "avg_response_time": 5.695260620117187,
-      "success_rate": 0.5,
+      "avg_response_time": 8.107608795166016,
+      "success_rate": 0.7,
       "avg_completeness": 1.0,
       "total_tests": 10,
-      "successful_tests": 5
+      "successful_tests": 7
     },
     {
       "source": "coincap",
@@ -60,411 +68,512 @@
   ],
   "detailed_results": [
     {
-      "source": "coinmarketcap",
+      "source": "binance",
       "endpoint": "price",
       "symbol": "BTCUSDT",
-      "response_time": 1.115675687789917,
+      "response_time": 0.9232537746429443,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:28:59.858980"
+      "timestamp": "2025-08-07T20:26:45.496838"
+    },
+    {
+      "source": "binance",
+      "endpoint": "klines",
+      "symbol": "BTCUSDT",
+      "response_time": 0.7595136165618896,
+      "success": true,
+      "error_message": "",
+      "data_completeness": 1.0,
+      "timestamp": "2025-08-07T20:26:47.257307"
+    },
+    {
+      "source": "binance",
+      "endpoint": "price",
+      "symbol": "ETHUSDT",
+      "response_time": 0.7386684417724609,
+      "success": true,
+      "error_message": "",
+      "data_completeness": 1.0,
+      "timestamp": "2025-08-07T20:26:48.996414"
+    },
+    {
+      "source": "binance",
+      "endpoint": "klines",
+      "symbol": "ETHUSDT",
+      "response_time": 0.7555642127990723,
+      "success": true,
+      "error_message": "",
+      "data_completeness": 1.0,
+      "timestamp": "2025-08-07T20:26:50.752771"
+    },
+    {
+      "source": "binance",
+      "endpoint": "price",
+      "symbol": "ADAUSDT",
+      "response_time": 0.7472703456878662,
+      "success": true,
+      "error_message": "",
+      "data_completeness": 1.0,
+      "timestamp": "2025-08-07T20:26:52.500629"
+    },
+    {
+      "source": "binance",
+      "endpoint": "klines",
+      "symbol": "ADAUSDT",
+      "response_time": 0.7683868408203125,
+      "success": true,
+      "error_message": "",
+      "data_completeness": 1.0,
+      "timestamp": "2025-08-07T20:26:54.269713"
+    },
+    {
+      "source": "binance",
+      "endpoint": "price",
+      "symbol": "SOLUSDT",
+      "response_time": 0.7685835361480713,
+      "success": true,
+      "error_message": "",
+      "data_completeness": 1.0,
+      "timestamp": "2025-08-07T20:26:56.039048"
+    },
+    {
+      "source": "binance",
+      "endpoint": "klines",
+      "symbol": "SOLUSDT",
+      "response_time": 0.7699224948883057,
+      "success": true,
+      "error_message": "",
+      "data_completeness": 1.0,
+      "timestamp": "2025-08-07T20:26:57.809384"
+    },
+    {
+      "source": "binance",
+      "endpoint": "price",
+      "symbol": "MATICUSDT",
+      "response_time": 0.8465111255645752,
+      "success": true,
+      "error_message": "",
+      "data_completeness": 1.0,
+      "timestamp": "2025-08-07T20:26:59.656572"
+    },
+    {
+      "source": "binance",
+      "endpoint": "klines",
+      "symbol": "MATICUSDT",
+      "response_time": 0.7784738540649414,
+      "success": true,
+      "error_message": "",
+      "data_completeness": 1.0,
+      "timestamp": "2025-08-07T20:27:01.435487"
+    },
+    {
+      "source": "coinmarketcap",
+      "endpoint": "price",
+      "symbol": "BTCUSDT",
+      "response_time": 2.0322813987731934,
+      "success": true,
+      "error_message": "",
+      "data_completeness": 1.0,
+      "timestamp": "2025-08-07T20:27:04.468559"
     },
     {
       "source": "coinmarketcap",
       "endpoint": "price",
       "symbol": "ETHUSDT",
-      "response_time": 0.7119541168212891,
+      "response_time": 0.6257944107055664,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:01.571665"
+      "timestamp": "2025-08-07T20:27:06.095091"
     },
     {
       "source": "coinmarketcap",
       "endpoint": "price",
       "symbol": "ADAUSDT",
-      "response_time": 0.8689920902252197,
+      "response_time": 0.7231254577636719,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:03.441611"
+      "timestamp": "2025-08-07T20:27:07.818877"
     },
     {
       "source": "coinmarketcap",
       "endpoint": "price",
       "symbol": "SOLUSDT",
-      "response_time": 0.9843344688415527,
+      "response_time": 0.7489204406738281,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:05.426404"
+      "timestamp": "2025-08-07T20:27:09.568223"
     },
     {
       "source": "coinmarketcap",
       "endpoint": "price",
       "symbol": "MATICUSDT",
-      "response_time": 0.8832764625549316,
+      "response_time": 1.4295191764831543,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:07.310455"
+      "timestamp": "2025-08-07T20:27:11.998208"
     },
     {
       "source": "yahoo",
       "endpoint": "price",
       "symbol": "BTCUSDT",
-      "response_time": 2.0478997230529785,
+      "response_time": 1.575885534286499,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:10.359547"
+      "timestamp": "2025-08-07T20:27:14.574983"
     },
     {
       "source": "yahoo",
       "endpoint": "price",
       "symbol": "ETHUSDT",
-      "response_time": 1.1866724491119385,
+      "response_time": 0.6019268035888672,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:12.547146"
+      "timestamp": "2025-08-07T20:27:16.177537"
     },
     {
       "source": "yahoo",
       "endpoint": "price",
       "symbol": "ADAUSDT",
-      "response_time": 0.9401423931121826,
+      "response_time": 0.6020798683166504,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:14.487984"
+      "timestamp": "2025-08-07T20:27:17.780273"
     },
     {
       "source": "yahoo",
       "endpoint": "price",
       "symbol": "SOLUSDT",
-      "response_time": 0.9448833465576172,
+      "response_time": 0.5916721820831299,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:16.433225"
+      "timestamp": "2025-08-07T20:27:19.372494"
     },
     {
       "source": "yahoo",
       "endpoint": "price",
       "symbol": "MATICUSDT",
-      "response_time": 0.9314544200897217,
+      "response_time": 0.8475668430328369,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:18.365071"
+      "timestamp": "2025-08-07T20:27:21.220727"
     },
     {
       "source": "cryptocompare",
       "endpoint": "price",
       "symbol": "BTCUSDT",
-      "response_time": 1.3853020668029785,
+      "response_time": 1.3350107669830322,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:20.750888"
+      "timestamp": "2025-08-07T20:27:23.556267"
     },
     {
       "source": "cryptocompare",
       "endpoint": "price",
       "symbol": "ETHUSDT",
-      "response_time": 1.3029282093048096,
+      "response_time": 1.3799495697021484,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:23.054293"
+      "timestamp": "2025-08-07T20:27:25.936790"
     },
     {
       "source": "cryptocompare",
       "endpoint": "price",
       "symbol": "ADAUSDT",
-      "response_time": 1.328087329864502,
+      "response_time": 1.3262841701507568,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:25.382986"
+      "timestamp": "2025-08-07T20:27:28.264134"
     },
     {
       "source": "cryptocompare",
       "endpoint": "price",
       "symbol": "SOLUSDT",
-      "response_time": 1.2957055568695068,
+      "response_time": 1.3337428569793701,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:27.679280"
+      "timestamp": "2025-08-07T20:27:30.598715"
     },
     {
       "source": "cryptocompare",
       "endpoint": "price",
       "symbol": "MATICUSDT",
-      "response_time": 1.3360183238983154,
+      "response_time": 1.3127427101135254,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:30.015839"
+      "timestamp": "2025-08-07T20:27:32.912304"
     },
     {
       "source": "coinpaprika",
       "endpoint": "price",
       "symbol": "BTCUSDT",
-      "response_time": 0.8985264301300049,
+      "response_time": 7.793552398681641,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:31.915594"
+      "timestamp": "2025-08-07T20:27:41.706235"
     },
     {
       "source": "coinpaprika",
       "endpoint": "price",
       "symbol": "ETHUSDT",
-      "response_time": 0.7322607040405273,
+      "response_time": 0.8885221481323242,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:33.648749"
+      "timestamp": "2025-08-07T20:27:43.595514"
     },
     {
       "source": "coinpaprika",
       "endpoint": "price",
       "symbol": "ADAUSDT",
-      "response_time": 1.7373533248901367,
+      "response_time": 0.7116084098815918,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:36.386919"
+      "timestamp": "2025-08-07T20:27:45.307608"
     },
     {
       "source": "coinpaprika",
       "endpoint": "price",
       "symbol": "SOLUSDT",
-      "response_time": 0.6922080516815186,
+      "response_time": 3.7245736122131348,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:38.079886"
+      "timestamp": "2025-08-07T20:27:50.032639"
     },
     {
       "source": "coinpaprika",
       "endpoint": "price",
       "symbol": "MATICUSDT",
-      "response_time": 0.7020318508148193,
+      "response_time": 0.6940948963165283,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:39.782704"
+      "timestamp": "2025-08-07T20:27:51.727278"
     },
     {
       "source": "kraken",
       "endpoint": "price",
       "symbol": "BTCUSDT",
-      "response_time": 0.6889562606811523,
+      "response_time": 0.7227523326873779,
       "success": false,
       "error_message": "No se encontró precio para BTCUSDT",
       "data_completeness": 0.0,
-      "timestamp": "2025-08-06T16:29:41.472266"
+      "timestamp": "2025-08-07T20:27:53.450784"
     },
     {
       "source": "kraken",
       "endpoint": "price",
       "symbol": "ETHUSDT",
-      "response_time": 0.7772810459136963,
+      "response_time": 0.7340090274810791,
       "success": false,
       "error_message": "No se encontró precio para ETHUSDT",
       "data_completeness": 0.0,
-      "timestamp": "2025-08-06T16:29:43.250219"
+      "timestamp": "2025-08-07T20:27:55.185560"
     },
     {
       "source": "kraken",
       "endpoint": "price",
       "symbol": "ADAUSDT",
-      "response_time": 0.7054474353790283,
+      "response_time": 0.6028468608856201,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:44.956625"
+      "timestamp": "2025-08-07T20:27:56.789148"
     },
     {
       "source": "kraken",
       "endpoint": "price",
       "symbol": "SOLUSDT",
-      "response_time": 0.7483928203582764,
+      "response_time": 1.2062394618988037,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:29:46.705453"
+      "timestamp": "2025-08-07T20:27:58.996081"
     },
     {
       "source": "kraken",
       "endpoint": "price",
       "symbol": "MATICUSDT",
-      "response_time": 0.7774844169616699,
+      "response_time": 0.859487771987915,
       "success": false,
       "error_message": "No se encontró precio para MATICUSDT",
       "data_completeness": 0.0,
-      "timestamp": "2025-08-06T16:29:48.483236"
+      "timestamp": "2025-08-07T20:28:00.856075"
     },
     {
       "source": "coincap",
       "endpoint": "price",
       "symbol": "BTCUSDT",
-      "response_time": 1.431978464126587,
+      "response_time": 1.778517246246338,
       "success": false,
       "error_message": "Client error '404 Not Found' for url 'https://api.coincap.io/v2/assets/bitcoin'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404",
       "data_completeness": 0.0,
-      "timestamp": "2025-08-06T16:29:50.915940"
+      "timestamp": "2025-08-07T20:28:03.635326"
     },
     {
       "source": "coincap",
       "endpoint": "price",
       "symbol": "ETHUSDT",
-      "response_time": 14.377339839935303,
+      "response_time": 2.4348208904266357,
       "success": false,
       "error_message": "Client error '404 Not Found' for url 'https://api.coincap.io/v2/assets/ethereum'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404",
       "data_completeness": 0.0,
-      "timestamp": "2025-08-06T16:30:06.294019"
+      "timestamp": "2025-08-07T20:28:07.070807"
     },
     {
       "source": "coincap",
       "endpoint": "price",
       "symbol": "ADAUSDT",
-      "response_time": 0.7038466930389404,
+      "response_time": 1.3737456798553467,
       "success": false,
       "error_message": "Client error '404 Not Found' for url 'https://api.coincap.io/v2/assets/cardano'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404",
       "data_completeness": 0.0,
-      "timestamp": "2025-08-06T16:30:07.998220"
+      "timestamp": "2025-08-07T20:28:09.445181"
     },
     {
       "source": "coincap",
       "endpoint": "price",
       "symbol": "SOLUSDT",
-      "response_time": 7.745126247406006,
+      "response_time": 0.7246472835540771,
       "success": false,
       "error_message": "Client error '404 Not Found' for url 'https://api.coincap.io/v2/assets/solana'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404",
       "data_completeness": 0.0,
-      "timestamp": "2025-08-06T16:30:16.743963"
+      "timestamp": "2025-08-07T20:28:11.170470"
     },
     {
       "source": "coincap",
       "endpoint": "price",
       "symbol": "MATICUSDT",
-      "response_time": 0.700359582901001,
+      "response_time": 2.391772508621216,
       "success": false,
       "error_message": "Client error '404 Not Found' for url 'https://api.coincap.io/v2/assets/matic-network'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404",
       "data_completeness": 0.0,
-      "timestamp": "2025-08-06T16:30:18.445194"
+      "timestamp": "2025-08-07T20:28:14.563033"
     },
     {
       "source": "coingecko",
       "endpoint": "price",
       "symbol": "BTCUSDT",
-      "response_time": 3.6799333095550537,
+      "response_time": 20.710567474365234,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:30:23.125582"
+      "timestamp": "2025-08-07T20:28:36.274474"
     },
     {
       "source": "coingecko",
       "endpoint": "klines",
       "symbol": "BTCUSDT",
-      "response_time": 0.7498533725738525,
+      "response_time": 15.697254419326782,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:30:24.876680"
+      "timestamp": "2025-08-07T20:28:52.973108"
     },
     {
       "source": "coingecko",
       "endpoint": "price",
       "symbol": "ETHUSDT",
-      "response_time": 0.6193249225616455,
+      "response_time": 10.652350425720215,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:30:26.496437"
+      "timestamp": "2025-08-07T20:29:04.626190"
     },
     {
       "source": "coingecko",
       "endpoint": "klines",
       "symbol": "ETHUSDT",
-      "response_time": 22.77402138710022,
+      "response_time": 0.6831448078155518,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:30:50.271279"
+      "timestamp": "2025-08-07T20:29:06.309950"
     },
     {
       "source": "coingecko",
       "endpoint": "price",
       "symbol": "ADAUSDT",
-      "response_time": 0.653170108795166,
+      "response_time": 0.673966646194458,
       "success": true,
       "error_message": "",
       "data_completeness": 1.0,
-      "timestamp": "2025-08-06T16:30:51.924957"
+      "timestamp": "2025-08-07T20:29:07.984748"
     },
     {
       "source": "coingecko",
       "endpoint": "klines",
       "symbol": "ADAUSDT",
-      "response_time": 3.5434064865112305,
-      "success": false,
-      "error_message": "Client error '429 Too Many Requests' for url 'https://api.coingecko.com/api/v3/coins/cardano/market_chart?vs_currency=usd&days=30'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
-      "data_completeness": 0.0,
-      "timestamp": "2025-08-06T16:30:56.468776"
+      "response_time": 7.684499502182007,
+      "success": true,
+      "error_message": "",
+      "data_completeness": 1.0,
+      "timestamp": "2025-08-07T20:29:16.669898"
     },
     {
       "source": "coingecko",
       "endpoint": "price",
       "symbol": "SOLUSDT",
-      "response_time": 0.45247411727905273,
-      "success": false,
-      "error_message": "Client error '429 Too Many Requests' for url 'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd&include_24hr_change=true'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
-      "data_completeness": 0.0,
-      "timestamp": "2025-08-06T16:30:57.922765"
+      "response_time": 0.6514782905578613,
+      "success": true,
+      "error_message": "",
+      "data_completeness": 1.0,
+      "timestamp": "2025-08-07T20:29:18.321938"
     },
     {
       "source": "coingecko",
       "endpoint": "klines",
       "symbol": "SOLUSDT",
-      "response_time": 0.4705827236175537,
+      "response_time": 1.4458250999450684,
       "success": false,
       "error_message": "Client error '429 Too Many Requests' for url 'https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=30'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
       "data_completeness": 0.0,
-      "timestamp": "2025-08-06T16:30:59.393812"
+      "timestamp": "2025-08-07T20:29:20.768499"
     },
     {
       "source": "coingecko",
       "endpoint": "price",
       "symbol": "MATICUSDT",
-      "response_time": 7.483214855194092,
+      "response_time": 0.4886918067932129,
       "success": false,
       "error_message": "Client error '429 Too Many Requests' for url 'https://api.coingecko.com/api/v3/simple/price?ids=matic-network&vs_currencies=usd&include_24hr_change=true'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
       "data_completeness": 0.0,
-      "timestamp": "2025-08-06T16:31:07.877430"
+      "timestamp": "2025-08-07T20:29:22.257544"
     },
     {
       "source": "coingecko",
       "endpoint": "klines",
       "symbol": "MATICUSDT",
-      "response_time": 1.615201711654663,
+      "response_time": 0.46607327461242676,
       "success": false,
       "error_message": "Client error '429 Too Many Requests' for url 'https://api.coingecko.com/api/v3/coins/matic-network/market_chart?vs_currency=usd&days=30'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429",
       "data_completeness": 0.0,
-      "timestamp": "2025-08-06T16:31:10.493420"
+      "timestamp": "2025-08-07T20:29:23.724642"
     }
   ],
   "recommended_order": [
-    "coinmarketcap",
-    "coinpaprika",
+    "binance",
     "yahoo",
+    "coinmarketcap",
     "cryptocompare",
+    "coinpaprika",
     "kraken",
     "coingecko",
     "coincap"
