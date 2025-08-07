@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     g++ \
     libfreetype6-dev \
     pkg-config \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Establecer directorio de trabajo
@@ -31,6 +32,9 @@ RUN python create_tables.py
 ENV PYTHONUNBUFFERED=1
 ENV PORT=8000
 
+# Hacer ejecutable el script de inicio
+RUN chmod +x start.sh
+
 # Exponer puerto
 EXPOSE 8000
 
@@ -38,5 +42,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/healthz || exit 1
 
-# Comando de inicio explícito
-CMD ["python", "/app/start_production.py"]
+# Comando de inicio usando el script
+CMD ["/app/start.sh"]
