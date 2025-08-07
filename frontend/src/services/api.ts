@@ -7,9 +7,6 @@ const api = axios.create({
   timeout: 30000, // Aumentado a 30 segundos
 });
 
-// Exportar la URL base para usar en otros componentes
-export { API_BASE_URL as baseURL };
-
 export interface TickerPrice {
   symbol: string;
   price: number;
@@ -67,6 +64,8 @@ export interface TickerRecommendationSummary {
 }
 
 export const apiService = {
+  baseURL: API_BASE_URL,
+  
   // Obtener precio de un ticker
   getTickerPrice: async (symbol: string, period: string = '1d'): Promise<TickerPrice> => {
     const response = await api.get(`/binance/price/${symbol}?period=${period}`);
