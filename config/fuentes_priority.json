@@ -2,12 +2,12 @@
   "last_updated": "2025-08-07T20:29:24.727745",
   "source_order": [
     "binance",
-    "yahoo",
     "coinmarketcap",
     "cryptocompare",
     "coinpaprika",
     "kraken",
     "coingecko",
+    "yahoo",
     "alpha_vantage",
     "polygon",
     "finnhub",
@@ -82,6 +82,6 @@
   "metadata": {
     "total_sources": 8,
     "benchmark_timestamp": "2025-08-07T20:29:24.727745",
-    "description": "Configuración actualizada automáticamente - Binance ahora funciona desde Railway"
+    "description": "Configuración optimizada - Yahoo movido a posición 7 para reducir errores 429"
   }
 }
