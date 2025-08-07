@@ -18,7 +18,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 # Configuración de API Keys
-COINGECKO_API_KEY = os.getenv('COINGECKO_API_KEY', '')  # Pendiente de API key correcta
+COINGECKO_API_KEY = os.getenv('COINGECKO_API_KEY', '')  # No requiere API key para endpoints básicos
 COINMARKETCAP_API_KEY = os.getenv('COINMARKETCAP_API_KEY', 'f76a0f82-e398-4343-8fa3-edbc78ae73fc')
 CRYPTOCOMPARE_API_KEY = os.getenv('CRYPTOCOMPARE_API_KEY', '')
 
@@ -74,35 +74,40 @@ class DataSourceBenchmark:
                 'coincap': 'bitcoin',
                 'cryptocompare': 'BTC',
                 'coinpaprika': 'btc-bitcoin',
-                'yahoo': 'BTC-USD'
+                'yahoo': 'BTC-USD',
+                'binance': 'BTCUSDT'
             },
             'ETHUSDT': {
                 'coingecko': 'ethereum',
                 'coincap': 'ethereum',
                 'cryptocompare': 'ETH',
                 'coinpaprika': 'eth-ethereum',
-                'yahoo': 'ETH-USD'
+                'yahoo': 'ETH-USD',
+                'binance': 'ETHUSDT'
             },
             'ADAUSDT': {
                 'coingecko': 'cardano',
                 'coincap': 'cardano',
                 'cryptocompare': 'ADA',
                 'coinpaprika': 'ada-cardano',
-                'yahoo': 'ADA-USD'
+                'yahoo': 'ADA-USD',
+                'binance': 'ADAUSDT'
             },
             'SOLUSDT': {
                 'coingecko': 'solana',
                 'coincap': 'solana',
                 'cryptocompare': 'SOL',
                 'coinpaprika': 'sol-solana',
-                'yahoo': 'SOL-USD'
+                'yahoo': 'SOL-USD',
+                'binance': 'SOLUSDT'
             },
             'MATICUSDT': {
                 'coingecko': 'matic-network',
                 'coincap': 'matic-network',
                 'cryptocompare': 'MATIC',
                 'coinpaprika': 'matic-polygon',
-                'yahoo': 'MATIC-USD'
+                'yahoo': 'MATIC-USD',
+                'binance': 'MATICUSDT'
             }
         }
     
@@ -140,6 +145,36 @@ class DataSourceBenchmark:
             return present_fields / len(required_fields)
         
         return 0.5  # Valor por defecto
+
+    def test_binance_price(self, symbol: str) -> Dict:
+        """Test de precio con Binance"""
+        try:
+            url = f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}"
+            
+            with httpx.Client(timeout=10, headers=self.headers) as client:
+                response = client.get(url)
+                response.raise_for_status()
+                data = response.json()
+                
+                return {
+                    "symbol": symbol,
+                    "price": float(data['price']),
+                    "source": "binance"
+                }
+        except Exception as e:
+            return {"error": f"Error con Binance: {str(e)}"}
+
+    def test_binance_klines(self, symbol: str) -> List:
+        """Test de klines con Binance"""
+        try:
+            url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval=1h&limit=100"
+            
+            with httpx.Client(timeout=15, headers=self.headers) as client:
+                response = client.get(url)
+                response.raise_for_status()
+                return response.json()
+        except Exception as e:
+            return []
     
     def test_coingecko_price(self, symbol: str) -> Dict:
         """Test de precio con CoinGecko (endpoint gratuito)"""
@@ -327,6 +362,10 @@ class DataSourceBenchmark:
         
         # Definir fuentes a testear
         sources = {
+            'binance': {
+                'price': self.test_binance_price,
+                'klines': self.test_binance_klines
+            },
             'coinmarketcap': {
                 'price': self.test_coinmarketcap_price,
                 'klines': None  # CoinMarketCap requiere endpoint adicional para klines
@@ -568,4 +607,4 @@ def main():
     print("\n✅ Benchmark completado exitosamente!")
 
 if __name__ == "__main__":
-    main() 
+    main()
