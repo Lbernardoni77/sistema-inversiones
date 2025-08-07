@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate, useParams } from '
 import TickerInput from './components/TickerInput';
 import TickerCard from './components/TickerCard';
 import TickerDetails from './components/TickerDetails';
-import CandleChart from './components/CandleChart';
+import LocalChart from './components/LocalChart';
 import HorizonSelector from './components/HorizonSelector';
 import apiService, { TickerRecommendation, TickerRecommendationSummary } from './services/api';
 
@@ -69,8 +69,7 @@ function Dashboard() {
   const [selectedChartSymbol, setSelectedChartSymbol] = useState<string | null>(null);
   const [chartRange, setChartRange] = useState<string>('1mo');
   const [chartInterval, setChartInterval] = useState<string>('1d');
-  const [klines, setKlines] = useState<any[]>([]);
-  const [selectedChartRecommendation, setSelectedChartRecommendation] = useState<TickerRecommendation | null>(null);
+  // Variables eliminadas: klines y selectedChartRecommendation (ya no son necesarias con LocalChart)
   const [selectedHorizon, setSelectedHorizon] = useState<string>("24h");
   const chartRangeOptions = [
     { value: '1d', label: '1 Día', limit: 1 },
@@ -106,36 +105,7 @@ function Dashboard() {
     }
   }, [tickers, selectedChartSymbol]);
 
-  // Obtener klines para el gráfico
-  React.useEffect(() => {
-    async function fetchKlines() {
-      if (!selectedChartSymbol) {
-        setKlines([]);
-        return;
-      }
-      const limit = getKlinesLimit(chartRange, chartInterval);
-      const data = await apiService.getKlines(selectedChartSymbol, chartInterval, limit);
-      setKlines(data);
-    }
-    fetchKlines();
-  }, [selectedChartSymbol, chartRange, chartInterval]);
-
-  // En Dashboard, agrega un estado para la recomendación del ticker seleccionado:
-  useEffect(() => {
-    async function fetchRecommendation() {
-      if (!selectedChartSymbol) {
-        setSelectedChartRecommendation(null);
-        return;
-      }
-      try {
-        const rec = await apiService.getTickerRecommendation(selectedChartSymbol, selectedHorizon);
-        setSelectedChartRecommendation(rec);
-      } catch (e) {
-        setSelectedChartRecommendation(null);
-      }
-    }
-    fetchRecommendation();
-  }, [selectedChartSymbol, selectedHorizon]);
+  // useEffect eliminados: fetchKlines y fetchRecommendation (LocalChart los maneja internamente)
 
   const navigate = useNavigate();
 
@@ -402,26 +372,15 @@ function Dashboard() {
                   </select>
                 </div>
                 <div style={{ marginBottom: 32 }}>
-                  {(() => {
-                    const soportesToPass = selectedChartRecommendation?.detalle?.soportes ?? [];
-                    const resistenciasToPass = selectedChartRecommendation?.detalle?.resistencias ?? [];
-                    const isRecommendationReady = soportesToPass.length > 0 || resistenciasToPass.length > 0;
-                    if (!isRecommendationReady) {
-                      return (
-                        <div style={{ textAlign: 'center', color: '#888', fontWeight: 600, padding: 40 }}>
-                          Cargando soportes y resistencias...
-                        </div>
-                      );
-                    }
-                    return (
-                      <CandleChart
-                        klines={klines}
-                        height={400}
-                        soportes={soportesToPass}
-                        resistencias={resistenciasToPass}
-                      />
-                    );
-                  })()}
+                  <LocalChart
+                    symbol={selectedChartSymbol}
+                    interval={chartInterval}
+                    limit={getKlinesLimit(chartRange, chartInterval)}
+                    showIndicators={true}
+                    showSupportResistance={true}
+                    height={400}
+                    chartType="candlestick"
+                  />
                 </div>
                 <div style={{ color: '#888', fontSize: 14, marginBottom: 8 }}>
                   Mostrando: <b>{selectedChartSymbol}</b>
@@ -457,7 +416,7 @@ function TickerDetailPage() {
   });
   const [chartRange, setChartRange] = useState<string>('1mo');
   const [chartInterval, setChartInterval] = useState<string>('1d');
-  const [klines, setKlines] = useState<any[]>([]);
+  // Variable eliminada: klines (LocalChart los maneja internamente)
   const chartRangeOptions = [
     { value: '1d', label: '1 Día', limit: 1 },
     { value: '1mo', label: '1 Mes', limit: 30 },
@@ -516,26 +475,11 @@ function TickerDetailPage() {
     }
   }, [symbol, period]);
 
-  const fetchKlines = React.useCallback(async () => {
-    if (!symbol) return;
-    try {
-      const limit = getKlinesLimit(chartRange, chartInterval);
-      const data = await apiService.getKlines(symbol, chartInterval, limit);
-      setKlines(data);
-    } catch (e) {
-      console.error('Error fetching klines for', symbol, ':', e);
-      // No vaciar los datos existentes en caso de error
-      // setKlines([]);
-    }
-  }, [symbol, chartRange, chartInterval]);
+  // Función eliminada: fetchKlines (LocalChart los maneja internamente)
 
   React.useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  React.useEffect(() => {
-    fetchKlines();
-  }, [fetchKlines]);
 
   return (
     <div className="dashboard">
@@ -565,28 +509,15 @@ function TickerDetailPage() {
           </select>
         </div>
         <div style={{ marginBottom: 32 }}>
-          {(() => {
-            const soportesToPass = recommendation?.detalle?.soportes ?? [];
-            const resistenciasToPass = recommendation?.detalle?.resistencias ?? [];
-            const isRecommendationReady = soportesToPass.length > 0 || resistenciasToPass.length > 0;
-            if (!isRecommendationReady) {
-              return (
-                <div style={{ textAlign: 'center', color: '#888', fontWeight: 600, padding: 40 }}>
-                  Cargando soportes y resistencias...
-                </div>
-              );
-            }
-            console.log('Passing to CandleChart - soportes:', soportesToPass);
-            console.log('Passing to CandleChart - resistencias:', resistenciasToPass);
-            return (
-              <CandleChart 
-                klines={klines} 
-                height={400} 
-                soportes={soportesToPass}
-                resistencias={resistenciasToPass}
-              />
-            );
-          })()}
+          <LocalChart
+            symbol={symbol || ''}
+            interval={chartInterval}
+            limit={getKlinesLimit(chartRange, chartInterval)}
+            showIndicators={true}
+            showSupportResistance={true}
+            height={400}
+            chartType="candlestick"
+          />
         </div>
         <TickerDetails
           symbol={symbol || ''}
