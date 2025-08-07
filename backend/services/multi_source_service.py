@@ -9,7 +9,13 @@ import json
 import os
 from typing import List, Dict, Optional
 from datetime import datetime, timedelta
-import yfinance as yf
+# Import opcional de yfinance
+try:
+    import yfinance as yf
+    YFINANCE_AVAILABLE = True
+except ImportError:
+    YFINANCE_AVAILABLE = False
+    print("⚠️ yfinance no está disponible, Yahoo Finance será omitido")
 
 # Configuración de API Keys
 COINMARKETCAP_API_KEY = os.getenv('COINMARKETCAP_API_KEY', 'f76a0f82-e398-4343-8fa3-edbc78ae73fc')
@@ -206,6 +212,9 @@ class MultiSourceService:
     
     def get_yahoo_price(self, symbol: str) -> Optional[Dict]:
         """Obtiene precio de Yahoo Finance"""
+        if not YFINANCE_AVAILABLE:
+            return {"error": "Yahoo Finance no está disponible (yfinance no instalado)"}
+        
         try:
             yahoo_symbol = self.symbol_mapping[symbol]['yahoo']
             ticker = yf.Ticker(yahoo_symbol)
