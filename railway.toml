@@ -1,0 +1,15 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "cd backend && python create_tables.py && python start_production.py"
+healthcheckPath = "/healthz"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"
+
+[env]
+# Variables de entorno se configuran en el dashboard
+
+[[services]]
+name = "backend"
+source = "."
