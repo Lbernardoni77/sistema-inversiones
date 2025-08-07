@@ -1,38 +1,38 @@
 {
-  "last_updated": "2025-08-06T16:31:17.596292",
+  "last_updated": "2025-08-07T20:29:24.727745",
   "source_order": [
-    "coinmarketcap",
-    "coinpaprika",
+    "binance",
     "yahoo",
+    "coinmarketcap",
     "cryptocompare",
+    "coinpaprika",
     "kraken",
+    "coingecko",
     "alpha_vantage",
     "polygon",
     "finnhub",
-    "binance",
-    "coingecko",
     "coincap"
   ],
   "performance_data": [
     {
-      "source": "coinmarketcap",
-      "avg_response_time": 0.912846565246582,
+      "source": "binance",
+      "avg_response_time": 0.79,
       "success_rate": 1.0,
       "avg_completeness": 1.0,
-      "total_tests": 5,
-      "successful_tests": 5
-    },
-    {
-      "source": "coinpaprika",
-      "avg_response_time": 0.9524760723114014,
-      "success_rate": 1.0,
-      "avg_completeness": 1.0,
-      "total_tests": 5,
-      "successful_tests": 5
+      "total_tests": 10,
+      "successful_tests": 10
     },
     {
       "source": "yahoo",
-      "avg_response_time": 1.2102104663848876,
+      "avg_response_time": 0.84,
+      "success_rate": 1.0,
+      "avg_completeness": 1.0,
+      "total_tests": 5,
+      "successful_tests": 5
+    },
+    {
+      "source": "coinmarketcap",
+      "avg_response_time": 1.11,
       "success_rate": 1.0,
       "avg_completeness": 1.0,
       "total_tests": 5,
@@ -40,7 +40,15 @@
     },
     {
       "source": "cryptocompare",
-      "avg_response_time": 1.3296082973480225,
+      "avg_response_time": 1.34,
+      "success_rate": 1.0,
+      "avg_completeness": 1.0,
+      "total_tests": 5,
+      "successful_tests": 5
+    },
+    {
+      "source": "coinpaprika",
+      "avg_response_time": 2.76,
       "success_rate": 1.0,
       "avg_completeness": 1.0,
       "total_tests": 5,
@@ -48,7 +56,7 @@
     },
     {
       "source": "kraken",
-      "avg_response_time": 0.7269201278686523,
+      "avg_response_time": 0.90,
       "success_rate": 0.4,
       "avg_completeness": 1.0,
       "total_tests": 5,
@@ -56,11 +64,11 @@
     },
     {
       "source": "coingecko",
-      "avg_response_time": 5.695260620117187,
-      "success_rate": 0.5,
+      "avg_response_time": 8.11,
+      "success_rate": 0.7,
       "avg_completeness": 1.0,
       "total_tests": 10,
-      "successful_tests": 5
+      "successful_tests": 7
     },
     {
       "source": "coincap",
@@ -72,8 +80,8 @@
     }
   ],
   "metadata": {
-    "total_sources": 7,
-    "benchmark_timestamp": "2025-08-06T16:31:11.499066",
-    "description": "Configuración actualizada automáticamente"
+    "total_sources": 8,
+    "benchmark_timestamp": "2025-08-07T20:29:24.727745",
+    "description": "Configuración actualizada automáticamente - Binance ahora funciona desde Railway"
   }
 }
