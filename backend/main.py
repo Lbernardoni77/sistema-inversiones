@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
-from services.binance_service import get_binance_price, get_recommendation, get_binance_klines, log_signal
+from services.binance_service import get_recommendation, get_binance_klines, log_signal
+from services.multi_source_service import MultiSourceService
 from services.external_data_service import (
     get_fear_and_greed_index,
     get_crypto_news,
@@ -45,6 +46,9 @@ Base.metadata.create_all(bind=engine)
 
 # Configurar el scheduler para jobs automáticos
 scheduler = BackgroundScheduler()
+
+# Instancia del servicio de múltiples fuentes
+multi_source_service = MultiSourceService()
 
 def optimize_weights_job():
     """
@@ -194,7 +198,7 @@ def health_check():
 
 @app.get("/binance/price/{symbol}")
 def binance_price(symbol: str, period: str = Query("1d", enum=["1d", "1mo", "1y", "all"])):
-    return get_binance_price(symbol, period)
+    return multi_source_service.get_price(symbol, period)
 
 @app.get("/binance/recommendation/{symbol}")
 def binance_recommendation(symbol: str, horizonte: str = Query("24h", enum=["1h", "4h", "12h", "24h", "7d", "1mes"])):
