@@ -7,11 +7,11 @@
     "coinpaprika",
     "kraken",
     "coingecko",
-    "yahoo",
     "alpha_vantage",
     "polygon",
     "finnhub",
-    "coincap"
+    "coincap",
+    "yahoo"
   ],
   "performance_data": [
     {
@@ -82,6 +82,6 @@
   "metadata": {
     "total_sources": 8,
     "benchmark_timestamp": "2025-08-07T20:29:24.727745",
-    "description": "Configuración optimizada - Yahoo movido a posición 7 para reducir errores 429"
+    "description": "Configuración optimizada - Yahoo movido a última posición para eliminar errores 429"
   }
 }
