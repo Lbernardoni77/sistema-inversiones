@@ -488,17 +488,52 @@ def get_multi_source_klines(symbol: str, interval: str = "1h", limit: int = 200)
         from services.multi_source_service import MultiSourceService
         multi_source = MultiSourceService()
         
-        # Intentar obtener klines de múltiples fuentes
-        # Por ahora, usamos Binance como principal y CoinGecko como fallback
-        # En el futuro, esto se puede expandir para usar todas las fuentes
-        klines = get_binance_klines(symbol, interval, limit)
-        if not klines or len(klines) == 0:
-            print(f"Binance klines vacío para {symbol}, usando CoinGecko")
-            klines = get_coingecko_klines(symbol, interval, limit)
+        # Cargar prioridades dinámicas
+        source_priorities = multi_source.load_source_priorities()
+        print(f"🔄 Intentando klines para {symbol} con prioridades: {source_priorities}")
         
-        return klines
+        # Intentar cada fuente en orden de prioridad
+        for source in source_priorities:
+            try:
+                if source == 'binance':
+                    klines = get_binance_klines(symbol, interval, limit)
+                    if klines and len(klines) > 0:
+                        print(f"✅ Klines obtenidos de BINANCE para {symbol}")
+                        return klines
+                elif source == 'coingecko':
+                    klines = get_coingecko_klines(symbol, interval, limit)
+                    if klines and len(klines) > 0:
+                        print(f"✅ Klines obtenidos de COINGECKO para {symbol}")
+                        return klines
+                elif source == 'coinmarketcap':
+                    # CoinMarketCap no tiene endpoint de klines, saltar
+                    continue
+                elif source == 'coinpaprika':
+                    # CoinPaprika no tiene endpoint de klines, saltar
+                    continue
+                elif source == 'yahoo':
+                    # Yahoo Finance no tiene endpoint de klines, saltar
+                    continue
+                elif source == 'cryptocompare':
+                    # CryptoCompare no tiene endpoint de klines, saltar
+                    continue
+                elif source == 'kraken':
+                    # Kraken no tiene endpoint de klines, saltar
+                    continue
+                elif source == 'coincap':
+                    # CoinCap no tiene endpoint de klines, saltar
+                    continue
+                    
+            except Exception as e:
+                print(f"❌ Error con {source} para klines de {symbol}: {e}")
+                continue
+        
+        # Si todas las fuentes fallan, intentar Binance como último recurso
+        print(f"⚠️ Todas las fuentes fallaron para klines de {symbol}, intentando Binance como último recurso")
+        return get_binance_klines(symbol, interval, limit)
+        
     except Exception as e:
-        print(f"Error con múltiples fuentes para klines, usando Binance: {e}")
+        print(f"❌ Error general con múltiples fuentes para klines de {symbol}: {e}")
         return get_binance_klines(symbol, interval, limit)
 
 def get_binance_klines(symbol: str, interval: str = "1h", limit: int = 200) -> List[list]:
