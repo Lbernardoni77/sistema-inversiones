@@ -6,6 +6,9 @@
     "yahoo",
     "cryptocompare",
     "kraken",
+    "alpha_vantage",
+    "polygon",
+    "finnhub",
     "binance",
     "coingecko",
     "coincap"

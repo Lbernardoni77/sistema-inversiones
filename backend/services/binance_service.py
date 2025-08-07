@@ -523,7 +523,22 @@ def get_multi_source_klines(symbol: str, interval: str = "1h", limit: int = 200)
                 elif source == 'coincap':
                     # CoinCap no tiene endpoint de klines, saltar
                     continue
-                    
+                elif source == 'alpha_vantage':
+                    klines = multi_source.get_alpha_vantage_klines(symbol, interval, limit)
+                    if klines and len(klines) > 0:
+                        print(f"✅ Klines obtenidos de ALPHA VANTAGE para {symbol}")
+                        return klines
+                elif source == 'polygon':
+                    klines = multi_source.get_polygon_klines(symbol, interval, limit)
+                    if klines and len(klines) > 0:
+                        print(f"✅ Klines obtenidos de POLYGON para {symbol}")
+                        return klines
+                elif source == 'finnhub':
+                    klines = multi_source.get_finnhub_klines(symbol, interval, limit)
+                    if klines and len(klines) > 0:
+                        print(f"✅ Klines obtenidos de FINNHUB para {symbol}")
+                        return klines
+                        
             except Exception as e:
                 print(f"❌ Error con {source} para klines de {symbol}: {e}")
                 continue

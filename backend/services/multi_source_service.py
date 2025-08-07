@@ -17,6 +17,14 @@ except ImportError:
     YFINANCE_AVAILABLE = False
     print("⚠️ yfinance no está disponible, Yahoo Finance será omitido")
 
+# Import opcional de alpha_vantage
+try:
+    from alpha_vantage.timeseries import TimeSeries
+    ALPHA_VANTAGE_AVAILABLE = True
+except ImportError:
+    ALPHA_VANTAGE_AVAILABLE = False
+    print("⚠️ alpha_vantage no está disponible, Alpha Vantage será omitido")
+
 # Configuración de API Keys
 COINMARKETCAP_API_KEY = os.getenv('COINMARKETCAP_API_KEY', 'f76a0f82-e398-4343-8fa3-edbc78ae73fc')
 
@@ -29,6 +37,11 @@ class MultiSourceService:
             'Accept': 'application/json',
             'Accept-Language': 'en-US,en;q=0.9'
         }
+        
+        # API Keys para nuevas fuentes
+        self.alpha_vantage_key = os.getenv('ALPHA_VANTAGE_API_KEY', 'demo')
+        self.polygon_key = os.getenv('POLYGON_API_KEY', 'demo')
+        self.finnhub_key = os.getenv('FINNHUB_API_KEY', 'demo')
         
         # Mapeo de símbolos para diferentes APIs
         self.symbol_mapping = {
@@ -358,4 +371,232 @@ class MultiSourceService:
             "change_30d": change_30d,
             "source": source,
             "timestamp": datetime.now().isoformat()
-        } 
+        }
+    
+    def get_alpha_vantage_klines(self, symbol: str, interval: str = "1h", limit: int = 200) -> Optional[List[list]]:
+        """Obtiene klines de Alpha Vantage"""
+        if not ALPHA_VANTAGE_AVAILABLE:
+            return None
+        
+        try:
+            # Mapear símbolos para Alpha Vantage
+            symbol_mapping = {
+                'BTCUSDT': 'BTC',
+                'ETHUSDT': 'ETH',
+                'ADAUSDT': 'ADA',
+                'SOLUSDT': 'SOL',
+                'MATICUSDT': 'MATIC',
+                'DOTUSDT': 'DOT',
+                'SHIBUSDT': 'SHIB',
+                'SANDUSDT': 'SAND',
+                'THETAUSDT': 'THETA',
+                'MANAUSDT': 'MANA'
+            }
+            
+            av_symbol = symbol_mapping.get(symbol, symbol.replace('USDT', ''))
+            
+            # Mapear intervalos
+            interval_mapping = {
+                '1m': '1min',
+                '5m': '5min',
+                '15m': '15min',
+                '30m': '30min',
+                '1h': '60min',
+                '4h': 'daily',
+                '1d': 'daily'
+            }
+            
+            av_interval = interval_mapping.get(interval, '60min')
+            
+            ts = TimeSeries(key=self.alpha_vantage_key, output_format='pandas')
+            
+            if av_interval == 'daily':
+                data, meta_data = ts.get_daily(symbol=av_symbol, outputsize='compact')
+            else:
+                data, meta_data = ts.get_intraday(symbol=av_symbol, interval=av_interval, outputsize='compact')
+            
+            if data.empty:
+                return None
+            
+            # Convertir a formato de klines [timestamp, open, high, low, close, volume]
+            klines = []
+            for index, row in data.tail(limit).iterrows():
+                kline = [
+                    int(index.timestamp() * 1000),  # timestamp en ms
+                    float(row['1. open']),
+                    float(row['2. high']),
+                    float(row['3. low']),
+                    float(row['4. close']),
+                    float(row['5. volume'])
+                ]
+                klines.append(kline)
+            
+            return klines
+            
+        except Exception as e:
+            print(f"❌ Error con Alpha Vantage para klines de {symbol}: {e}")
+            return None
+    
+    def get_polygon_klines(self, symbol: str, interval: str = "1h", limit: int = 200) -> Optional[List[list]]:
+        """Obtiene klines de Polygon.io"""
+        try:
+            # Mapear símbolos para Polygon
+            symbol_mapping = {
+                'BTCUSDT': 'X:BTCUSD',
+                'ETHUSDT': 'X:ETHUSD',
+                'ADAUSDT': 'X:ADAUSD',
+                'SOLUSDT': 'X:SOLUSD',
+                'MATICUSDT': 'X:MATICUSD',
+                'DOTUSDT': 'X:DOTUSD',
+                'SHIBUSDT': 'X:SHIBUSD',
+                'SANDUSDT': 'X:SANDUSD',
+                'THETAUSDT': 'X:THETAUSD',
+                'MANAUSDT': 'X:MANAUSD'
+            }
+            
+            polygon_symbol = symbol_mapping.get(symbol, f"X:{symbol.replace('USDT', 'USD')}")
+            
+            # Mapear intervalos
+            interval_mapping = {
+                '1m': '1',
+                '5m': '5',
+                '15m': '15',
+                '30m': '30',
+                '1h': '60',
+                '4h': '240',
+                '1d': 'D'
+            }
+            
+            polygon_interval = interval_mapping.get(interval, '60')
+            
+            # Calcular fechas
+            end_date = datetime.now()
+            start_date = end_date - timedelta(days=limit)
+            
+            url = f"https://api.polygon.io/v2/aggs/ticker/{polygon_symbol}/range/{polygon_interval}/minute/{start_date.strftime('%Y-%m-%d')}/{end_date.strftime('%Y-%m-%d')}?adjusted=true&sort=asc&limit={limit}&apiKey={self.polygon_key}"
+            
+            with httpx.Client(timeout=30, headers=self.headers) as client:
+                response = client.get(url)
+                response.raise_for_status()
+                data = response.json()
+                
+                if 'results' not in data or not data['results']:
+                    return None
+                
+                # Convertir a formato de klines
+                klines = []
+                for result in data['results']:
+                    kline = [
+                        result['t'],  # timestamp en ms
+                        result['o'],  # open
+                        result['h'],  # high
+                        result['l'],  # low
+                        result['c'],  # close
+                        result['v']   # volume
+                    ]
+                    klines.append(kline)
+                
+                return klines
+                
+        except Exception as e:
+            print(f"❌ Error con Polygon para klines de {symbol}: {e}")
+            return None
+    
+    def get_finnhub_klines(self, symbol: str, interval: str = "1h", limit: int = 200) -> Optional[List[list]]:
+        """Obtiene klines de Finnhub"""
+        try:
+            # Mapear símbolos para Finnhub
+            symbol_mapping = {
+                'BTCUSDT': 'BINANCE:BTCUSDT',
+                'ETHUSDT': 'BINANCE:ETHUSDT',
+                'ADAUSDT': 'BINANCE:ADAUSDT',
+                'SOLUSDT': 'BINANCE:SOLUSDT',
+                'MATICUSDT': 'BINANCE:MATICUSDT',
+                'DOTUSDT': 'BINANCE:DOTUSDT',
+                'SHIBUSDT': 'BINANCE:SHIBUSDT',
+                'SANDUSDT': 'BINANCE:SANDUSDT',
+                'THETAUSDT': 'BINANCE:THETAUSDT',
+                'MANAUSDT': 'BINANCE:MANAUSDT'
+            }
+            
+            finnhub_symbol = symbol_mapping.get(symbol, f"BINANCE:{symbol}")
+            
+            # Mapear intervalos
+            interval_mapping = {
+                '1m': '1',
+                '5m': '5',
+                '15m': '15',
+                '30m': '30',
+                '1h': '60',
+                '4h': '240',
+                '1d': 'D'
+            }
+            
+            finnhub_interval = interval_mapping.get(interval, '60')
+            
+            # Calcular fechas
+            end_timestamp = int(datetime.now().timestamp())
+            start_timestamp = end_timestamp - (limit * 3600)  # Aproximación para 1h
+            
+            url = f"https://finnhub.io/api/v1/stock/candle?symbol={finnhub_symbol}&resolution={finnhub_interval}&from={start_timestamp}&to={end_timestamp}&token={self.finnhub_key}"
+            
+            with httpx.Client(timeout=30, headers=self.headers) as client:
+                response = client.get(url)
+                response.raise_for_status()
+                data = response.json()
+                
+                if data['s'] != 'ok' or not data['t']:
+                    return None
+                
+                # Convertir a formato de klines
+                klines = []
+                for i in range(len(data['t'])):
+                    kline = [
+                        data['t'][i] * 1000,  # timestamp en ms
+                        data['o'][i],         # open
+                        data['h'][i],         # high
+                        data['l'][i],         # low
+                        data['c'][i],         # close
+                        data['v'][i]          # volume
+                    ]
+                    klines.append(kline)
+                
+                return klines
+                
+        except Exception as e:
+            print(f"❌ Error con Finnhub para klines de {symbol}: {e}")
+            return None
+    
+    def get_klines(self, symbol: str, interval: str = "1h", limit: int = 200) -> Optional[List[list]]:
+        """Obtiene klines usando múltiples fuentes con fallback"""
+        source_priorities = self.load_source_priorities()
+        
+        for source in source_priorities:
+            try:
+                klines_data = None
+                
+                if source == 'binance':
+                    continue  # Manejado en binance_service.py
+                elif source == 'coingecko':
+                    continue  # Manejado en binance_service.py
+                elif source == 'alpha_vantage':
+                    klines_data = self.get_alpha_vantage_klines(symbol, interval, limit)
+                elif source == 'polygon':
+                    klines_data = self.get_polygon_klines(symbol, interval, limit)
+                elif source == 'finnhub':
+                    klines_data = self.get_finnhub_klines(symbol, interval, limit)
+                else:
+                    continue  # Otras fuentes no tienen klines
+                
+                if klines_data and len(klines_data) > 0:
+                    return klines_data
+                    
+            except Exception as e:
+                print(f"❌ Error con {source} para klines de {symbol}: {e}")
+                continue
+        
+        return None
+    
+    def close(self):
+        """Cierra conexiones HTTP"""
+        pass  # httpx.Client se cierra automáticamente con context manager 

@@ -198,72 +198,6 @@
     "timestamp": 1754322829.1594083,
     "created_at": "2025-08-04T12:53:49.159412"
   },
-  "BTCUSDT_24h": {
-    "data": {
-      "symbol": "BTCUSDT",
-      "recomendacion": "Mantener",
-      "puntaje_total": 2.0,
-      "motivo": [
-        "🧠 Usando pesos optimizados por aprendizaje automático",
-        "MACD alcista [peso: 1.0]",
-        "SMA 7 > SMA 21 [peso: 1.0]",
-        "Sharpe negativo [peso: 1.0]"
-      ],
-      "indicadores": {
-        "rsi": 54.14,
-        "sma_7": 114575.1529,
-        "sma_21": 114527.1552,
-        "sma_50": 113867.4906,
-        "sma_200": 116406.0999,
-        "macd": 189.2866,
-        "macd_signal": 184.0052,
-        "macd_hist": 5.2815,
-        "bb_upper": 114959.4886,
-        "bb_mid": 114537.8535,
-        "bb_lower": 114116.2184,
-        "obv": -15099.2303,
-        "vwap": 116469.9845,
-        "sharpe_ratio": -3.4511,
-        "fg_index": 64,
-        "noticias_score": 0
-      },
-      "soportes": [
-        116523.14,
-        117400.01,
-        117579.99
-      ],
-      "resistencias": [
-        114899.87,
-        114025.75,
-        114009.99
-      ],
-      "contexto_sr": {
-        "influencia": null,
-        "nivel": null,
-        "precio": 114860.21,
-        "soportes": [
-          116523.14,
-          117400.01,
-          117579.99
-        ],
-        "resistencias": [
-          114899.87,
-          114025.75,
-          114009.99
-        ]
-      },
-      "horizonte": "24h",
-      "pesos_aplicados": {
-        "rsi": 1.0,
-        "macd": 1.0,
-        "sma": 1.0,
-        "soportes_resistencias": 1.0,
-        "sharpe": 1.0
-      }
-    },
-    "timestamp": 1754322850.605842,
-    "created_at": "2025-08-04T12:54:10.605845"
-  },
   "ADAUSDT_24h": {
     "data": {
       "symbol": "ADAUSDT",
@@ -593,5 +527,73 @@
     },
     "timestamp": 1754322921.3331022,
     "created_at": "2025-08-04T12:55:21.333107"
+  },
+  "BTCUSDT_24h": {
+    "data": {
+      "symbol": "BTCUSDT",
+      "recomendacion": "Mantener",
+      "puntaje_total": -1.0,
+      "motivo": [
+        "🧠 Usando pesos optimizados por aprendizaje automático",
+        "RSI alto (>70) [peso: 1.0]",
+        "MACD alcista [peso: 1.0]",
+        "SMA 7 > SMA 21 [peso: 1.0]",
+        "Sharpe negativo [peso: 1.0]",
+        "Noticias negativas"
+      ],
+      "indicadores": {
+        "rsi": 77.07,
+        "sma_7": 116288.8714,
+        "sma_21": 115311.7105,
+        "sma_50": 114577.6722,
+        "sma_200": 115034.5803,
+        "macd": 523.783,
+        "macd_signal": 355.6748,
+        "macd_hist": 168.1082,
+        "bb_upper": 116913.0515,
+        "bb_mid": 115314.2965,
+        "bb_lower": 113715.5415,
+        "obv": -15153.5028,
+        "vwap": 115281.939,
+        "sharpe_ratio": -3.1427,
+        "fg_index": 62,
+        "noticias_score": -1
+      },
+      "soportes": [
+        116523.14,
+        115331.86,
+        114615.99
+      ],
+      "resistencias": [
+        115325.88,
+        114899.87,
+        114129.75
+      ],
+      "contexto_sr": {
+        "influencia": null,
+        "nivel": null,
+        "precio": 116814.05866843043,
+        "soportes": [
+          116523.14,
+          115331.86,
+          114615.99
+        ],
+        "resistencias": [
+          115325.88,
+          114899.87,
+          114129.75
+        ]
+      },
+      "horizonte": "24h",
+      "pesos_aplicados": {
+        "rsi": 1.0,
+        "macd": 1.0,
+        "sma": 1.0,
+        "soportes_resistencias": 1.0,
+        "sharpe": 1.0
+      }
+    },
+    "timestamp": 1754582387.058843,
+    "created_at": "2025-08-07T12:59:47.058845"
   }
 }
