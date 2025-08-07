@@ -34,5 +34,9 @@ ENV PORT=8000
 # Exponer puerto
 EXPOSE 8000
 
-# Comando de inicio
-CMD ["python", "start_production.py"]
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/healthz || exit 1
+
+# Comando de inicio explícito
+CMD ["python", "/app/start_production.py"]
