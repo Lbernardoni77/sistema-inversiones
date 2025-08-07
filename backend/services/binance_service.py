@@ -480,6 +480,27 @@ def process_binance_data(symbol: str, price_actual: float, period: str = "1d") -
     except Exception as e:
         return {"error": str(e)}
 
+def get_multi_source_klines(symbol: str, interval: str = "1h", limit: int = 200) -> List[list]:
+    """
+    Obtiene datos de klines usando múltiples fuentes según prioridades dinámicas
+    """
+    try:
+        from services.multi_source_service import MultiSourceService
+        multi_source = MultiSourceService()
+        
+        # Intentar obtener klines de múltiples fuentes
+        # Por ahora, usamos Binance como principal y CoinGecko como fallback
+        # En el futuro, esto se puede expandir para usar todas las fuentes
+        klines = get_binance_klines(symbol, interval, limit)
+        if not klines or len(klines) == 0:
+            print(f"Binance klines vacío para {symbol}, usando CoinGecko")
+            klines = get_coingecko_klines(symbol, interval, limit)
+        
+        return klines
+    except Exception as e:
+        print(f"Error con múltiples fuentes para klines, usando Binance: {e}")
+        return get_binance_klines(symbol, interval, limit)
+
 def get_binance_klines(symbol: str, interval: str = "1h", limit: int = 200) -> List[list]:
     url = f"{BINANCE_KLINES_URL}?symbol={symbol.upper()}&interval={interval}&limit={limit}"
     
@@ -653,9 +674,28 @@ def get_recommendation(symbol: str, horizonte: str = "24h") -> dict:
         optimized_weights = None
     
     from services.external_data_service import get_fear_and_greed_index, get_crypto_news, analizar_sentimiento_noticias, sharpe_ratio
-    klines = get_binance_klines(symbol)
-    if not klines or len(klines) < 50:
-        return {"error": "No hay suficientes datos para análisis"}
+    
+    # Usar múltiples fuentes para obtener datos
+    try:
+        from services.multi_source_service import MultiSourceService
+        multi_source = MultiSourceService()
+        
+        # Obtener precio usando múltiples fuentes
+        price_data = multi_source.get_price(symbol, "1d")
+        if "error" in price_data:
+            print(f"❌ Error obteniendo precio para {symbol}: {price_data['error']}")
+            return {"error": f"No se pudo obtener precio para {symbol}"}
+        
+        # Obtener klines usando múltiples fuentes
+        klines = get_multi_source_klines(symbol)
+        if not klines or len(klines) < 50:
+            return {"error": "No hay suficientes datos para análisis"}
+            
+    except Exception as e:
+        print(f"⚠️ Error con múltiples fuentes, usando Binance como fallback: {e}")
+        klines = get_binance_klines(symbol)
+        if not klines or len(klines) < 50:
+            return {"error": "No hay suficientes datos para análisis"}
     
     closes, volumes = closes_volumes_from_klines(klines)
     rsi_value = rsi(closes)
@@ -706,7 +746,11 @@ def get_recommendation(symbol: str, horizonte: str = "24h") -> dict:
     todas_resistencias = list(set(resistencias_5 + resistencias_10 + resistencias_20))
     
     # Ordenar por relevancia (más cercanos al precio actual)
-    precio_actual = closes[-1]
+    # Usar precio de múltiples fuentes si está disponible, sino usar el último precio de closes
+    if 'price_data' in locals() and price_data and 'price' in price_data:
+        precio_actual = price_data['price']
+    else:
+        precio_actual = closes[-1]
     todos_soportes = sorted(todos_soportes, key=lambda x: abs(x - precio_actual))[:3]
     todas_resistencias = sorted(todas_resistencias, key=lambda x: abs(x - precio_actual))[:3]
     
