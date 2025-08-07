@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
-from services.binance_service import get_recommendation, get_binance_klines, log_signal
+from services.binance_service import BinanceService
 from services.multi_source_service import MultiSourceService
 from services.external_data_service import (
     get_fear_and_greed_index,
@@ -21,7 +21,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import json
 from services.learning_service import optimize_weights
 from services.reporting_service import ReportingService
-from services.binance_service import get_recommendation
+from datetime import datetime
 
 app = FastAPI()
 
@@ -47,8 +47,9 @@ Base.metadata.create_all(bind=engine)
 # Configurar el scheduler para jobs automáticos
 scheduler = BackgroundScheduler()
 
-# Instancia del servicio de múltiples fuentes
+# Instancias de servicios
 multi_source_service = MultiSourceService()
+binance_service = BinanceService()
 
 def optimize_weights_job():
     """
@@ -76,35 +77,35 @@ def save_signals_job():
     tickers = session.query(Ticker).all()
     for t in tickers:
         try:
-            rec = get_recommendation(t.symbol)
+            rec = binance_service.get_recommendation(t.symbol)
             if "error" in rec:
                 continue
             
-            # Extraer indicadores del detalle
-            detalle = rec.get("detalle", {})
-            indicadores = detalle.get("indicadores", {})
+            # Extraer indicadores
+            indicadores = rec.get("indicators", {})
             
             signal = Signal(
                 ticker_id=t.id,
-                price=rec.get("contexto_sr", {}).get("precio"),
+                price=rec.get("price"),
                 rsi=indicadores.get("rsi"),
-                sma_7=indicadores.get("sma_7"),
-                sma_21=indicadores.get("sma_21"),
+                sma_7=indicadores.get("sma_20"),  # Usar sma_20 como aproximación
+                sma_21=indicadores.get("sma_20"),  # Usar sma_20 como aproximación
                 sma_50=indicadores.get("sma_50"),
-                sma_200=indicadores.get("sma_200"),
+                sma_200=indicadores.get("sma_50"),  # Usar sma_50 como aproximación
                 macd=indicadores.get("macd"),
                 macd_signal=indicadores.get("macd_signal"),
-                macd_hist=indicadores.get("macd_hist"),
+                macd_hist=indicadores.get("macd", 0) - indicadores.get("macd_signal", 0),  # Calcular histograma
                 bb_upper=indicadores.get("bb_upper"),
-                bb_mid=indicadores.get("bb_mid"),
+                bb_mid=indicadores.get("bb_middle"),
                 bb_lower=indicadores.get("bb_lower"),
-                obv=indicadores.get("obv"),
-                vwap=indicadores.get("vwap"),
-                sharpe_ratio=indicadores.get("sharpe_ratio"),
-                recomendacion=rec.get("recomendacion"),
-                soportes=json.dumps(rec.get("soportes", [])),
-                resistencias=json.dumps(rec.get("resistencias", [])),
-                contexto_sr=json.dumps(rec.get("contexto_sr", {}))
+                obv=0,  # No disponible en la nueva implementación
+                vwap=0,  # No disponible en la nueva implementación
+                sharpe_ratio=0,  # No disponible en la nueva implementación
+                recomendacion=rec.get("recommendation"),
+                soportes=json.dumps([]),  # No disponible en la nueva implementación
+                resistencias=json.dumps([]),  # No disponible en la nueva implementación
+                contexto_sr=json.dumps({}),  # No disponible en la nueva implementación
+                timestamp=datetime.now()
             )
             session.add(signal)
             print(f"✅ Señal guardada para {t.symbol}")
@@ -137,14 +138,13 @@ def update_signals_resultado_real():
         ("resultado_real_7d", timedelta(days=7)),
         ("resultado_real_1mes", timedelta(days=30)),
     ]
-    from services.binance_service import get_binance_price
     for s in signals:
         for campo, delta in horizontes:
             if getattr(s, campo) is not None:
                 continue  # Ya calculado
             if (now - s.timestamp) < delta:
                 continue  # Aún no pasó el horizonte
-            price_data = get_binance_price(s.ticker.symbol)
+            price_data = binance_service.get_multi_source_price(s.ticker.symbol)
             if not price_data or 'price' not in price_data:
                 continue
             price_now = float(price_data['price'])
@@ -203,8 +203,8 @@ def binance_price(symbol: str, period: str = Query("1d", enum=["1d", "1mo", "1y"
 @app.get("/binance/recommendation/{symbol}")
 def binance_recommendation(symbol: str, horizonte: str = Query("24h", enum=["1h", "4h", "12h", "24h", "7d", "1mes"])):
     # Indicadores técnicos y de volumen
-    rec = get_recommendation(symbol, horizonte)
-    recomendacion_tecnica = rec.get("recomendacion", "Mantener")
+    rec = binance_service.get_recommendation(symbol)
+    recomendacion_tecnica = rec.get("recommendation", "NEUTRAL")
     # Índice de miedo y codicia
     fear_greed = get_fear_and_greed_index()
     fg_value = None
@@ -220,42 +220,44 @@ def binance_recommendation(symbol: str, horizonte: str = Query("24h", enum=["1h"
     fundamental = get_fundamental_data(symbol)
     onchain = get_onchain_data(symbol)
     # Ratio Sharpe (usando retornos de precios)
-    from services.binance_service import closes_volumes_from_klines, get_binance_klines
-    klines = get_binance_klines(symbol)
-    closes, _ = closes_volumes_from_klines(klines)
-    returns = [(closes[i] - closes[i-1])/closes[i-1] for i in range(1, len(closes))] if len(closes) > 1 else []
-    sharpe = sharpe_ratio(returns)
+    klines = binance_service.get_multi_source_klines(symbol)
+    if klines and len(klines) > 1:
+        closes = [float(k[4]) for k in klines]  # Precio de cierre
+        returns = [(closes[i] - closes[i-1])/closes[i-1] for i in range(1, len(closes))]
+        sharpe = sharpe_ratio(returns)
+    else:
+        sharpe = None
     # Ajuste de recomendación según sentimiento de noticias
     score = sentimiento_noticias["score"]
     recomendacion = recomendacion_tecnica
     ajuste_noticias = "Sin ajuste"
     if score > 0:
-        if recomendacion == "Mantener":
-            recomendacion = "Comprar"
+        if recomendacion == "NEUTRAL":
+            recomendacion = "BUY"
             ajuste_noticias = "Noticias positivas reforzaron señal de compra"
-        elif recomendacion == "Vender":
-            recomendacion = "Mantener"
+        elif recomendacion == "SELL":
+            recomendacion = "NEUTRAL"
             ajuste_noticias = "Noticias positivas moderaron señal de venta"
     elif score < 0:
-        if recomendacion == "Mantener":
-            recomendacion = "Vender"
+        if recomendacion == "NEUTRAL":
+            recomendacion = "SELL"
             ajuste_noticias = "Noticias negativas reforzaron señal de venta"
-        elif recomendacion == "Comprar":
-            recomendacion = "Mantener"
+        elif recomendacion == "BUY":
+            recomendacion = "NEUTRAL"
             ajuste_noticias = "Noticias negativas moderaron señal de compra"
     # Ajuste por Fear & Greed
     ajuste_fg = "Sin ajuste"
     if fg_value is not None:
-        if fg_value > 75 and recomendacion == "Comprar":
-            recomendacion = "Mantener"
+        if fg_value > 75 and recomendacion == "BUY":
+            recomendacion = "NEUTRAL"
             ajuste_fg = "Fear & Greed alto (>75) moderó señal de compra"
-        elif fg_value < 25 and recomendacion == "Vender":
-            recomendacion = "Mantener"
+        elif fg_value < 25 and recomendacion == "SELL":
+            recomendacion = "NEUTRAL"
             ajuste_fg = "Fear & Greed bajo (<25) moderó señal de venta"
     # Resumen de ponderación
     resumen_ponderacion = {
         "recomendacion_tecnica": recomendacion_tecnica,
-        "peso_indicadores_tecnicos": "70% (RSI, SMA, MACD, Bollinger, OBV, VWAP)",
+        "peso_indicadores_tecnicos": "70% (RSI, SMA, MACD, Bollinger)",
         "ajuste_noticias": ajuste_noticias,
         "peso_noticias": "20% (análisis de sentimiento en titulares)",
         "ajuste_fear_greed": ajuste_fg,
@@ -264,31 +266,32 @@ def binance_recommendation(symbol: str, horizonte: str = Query("24h", enum=["1h"
         "explicacion": f"La recomendación se basa principalmente en indicadores técnicos ({recomendacion_tecnica}), ajustada por sentimiento de noticias y precaución ante extremos de mercado."
     }
     # Respuesta principal y detalle
+    indicadores = rec.get("indicators", {})
     detalle = {
-        "motivo": rec.get("motivo", []),
+        "motivo": [f"Confidence: {rec.get('confidence', 0)}%"],
         "indicadores": {
-            "rsi": rec.get("rsi"),
-            "sma_7": rec.get("sma_7"),
-            "sma_21": rec.get("sma_21"),
-            "sma_50": rec.get("sma_50"),
-            "sma_200": rec.get("sma_200"),
-            "macd": rec.get("macd"),
-            "macd_signal": rec.get("macd_signal"),
-            "macd_hist": rec.get("macd_hist"),
-            "bb_upper": rec.get("bb_upper"),
-            "bb_mid": rec.get("bb_mid"),
-            "bb_lower": rec.get("bb_lower"),
-            "obv": rec.get("obv"),
-            "vwap": rec.get("vwap"),
+            "rsi": indicadores.get("rsi"),
+            "sma_7": indicadores.get("sma_20"),  # Usar sma_20 como aproximación
+            "sma_21": indicadores.get("sma_20"),  # Usar sma_20 como aproximación
+            "sma_50": indicadores.get("sma_50"),
+            "sma_200": indicadores.get("sma_50"),  # Usar sma_50 como aproximación
+            "macd": indicadores.get("macd"),
+            "macd_signal": indicadores.get("macd_signal"),
+            "macd_hist": indicadores.get("macd", 0) - indicadores.get("macd_signal", 0),  # Calcular histograma
+            "bb_upper": indicadores.get("bb_upper"),
+            "bb_mid": indicadores.get("bb_middle"),
+            "bb_lower": indicadores.get("bb_lower"),
+            "obv": 0,  # No disponible en la nueva implementación
+            "vwap": 0,  # No disponible en la nueva implementación
             "sharpe_ratio": sharpe
         },
-        "soportes": rec.get("soportes", []),
-        "resistencias": rec.get("resistencias", []),
+        "soportes": [],  # No disponible en la nueva implementación
+        "resistencias": [],  # No disponible en la nueva implementación
         "fundamental": fundamental,
         "onchain": onchain,
         "sentimiento": {"fear_and_greed": fear_greed, "noticias": sentimiento_noticias},
         "noticias": news,
-        "resumen_ponderacion": rec.get("resumen_ponderacion", {})
+        "resumen_ponderacion": resumen_ponderacion
     }
     return {"recomendacion": recomendacion, "horizonte": horizonte, "detalle": detalle}
 
@@ -296,7 +299,7 @@ def binance_recommendation(symbol: str, horizonte: str = Query("24h", enum=["1h"
 def binance_snapshot(tickers: List[str] = Body(..., embed=True)):
     resultados = []
     for symbol in tickers:
-        rec = get_recommendation(symbol)
+        rec = binance_service.get_recommendation(symbol)
         if "error" in rec:
             resultados.append({"symbol": symbol, "error": rec["error"]})
             continue
@@ -322,7 +325,7 @@ def binance_snapshot(tickers: List[str] = Body(..., embed=True)):
 
 @app.get("/binance/klines/{symbol}")
 def binance_klines(symbol: str, interval: str = Query("1d"), limit: int = Query(30)):
-    return get_binance_klines(symbol, interval, limit)
+    return binance_service.get_multi_source_klines(symbol, interval, limit)
 
 @app.post("/tickers/add")
 def add_ticker(symbol: str):
@@ -368,23 +371,24 @@ def get_tickers_recommendations(horizonte: str = Query("24h", enum=["1h", "4h", 
     resultados = []
     for ticker in tickers:
         try:
-            rec = get_recommendation(ticker.symbol, horizonte)
+            rec = binance_service.get_recommendation(ticker.symbol)
             if "error" not in rec:
+                indicadores = rec.get("indicators", {})
                 resultados.append({
                     "symbol": ticker.symbol,
-                    "recomendacion": rec.get("recomendacion", "Mantener"),
+                    "recomendacion": rec.get("recommendation", "NEUTRAL"),
                     "horizonte": horizonte,
                     "precio": rec.get("price"),
                     "indicadores": {
-                        "rsi": rec.get("rsi"),
-                        "macd": rec.get("macd"),
-                        "sma_7": rec.get("sma_7"),
-                        "sma_21": rec.get("sma_21"),
-                        "sma_50": rec.get("sma_50"),
-                        "sma_200": rec.get("sma_200")
+                        "rsi": indicadores.get("rsi"),
+                        "macd": indicadores.get("macd"),
+                        "sma_7": indicadores.get("sma_20"),  # Usar sma_20 como aproximación
+                        "sma_21": indicadores.get("sma_20"),  # Usar sma_20 como aproximación
+                        "sma_50": indicadores.get("sma_50"),
+                        "sma_200": indicadores.get("sma_50")  # Usar sma_50 como aproximación
                     },
-                    "soportes": rec.get("soportes", []),
-                    "resistencias": rec.get("resistencias", [])
+                    "soportes": [],  # No disponible en la nueva implementación
+                    "resistencias": []  # No disponible en la nueva implementación
                 })
             else:
                 resultados.append({

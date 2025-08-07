@@ -9,6 +9,7 @@ import json
 import os
 from typing import List, Dict, Optional
 from datetime import datetime, timedelta
+
 # Import opcional de yfinance
 try:
     import yfinance as yf
@@ -130,10 +131,10 @@ class MultiSourceService:
                     return config.get('source_order', [])
             else:
                 # Prioridades por defecto si no existe el archivo
-                return ['coinmarketcap', 'coinpaprika', 'yahoo', 'cryptocompare', 'kraken', 'coingecko', 'coincap']
+                return ['coinmarketcap', 'coinpaprika', 'yahoo', 'cryptocompare', 'kraken', 'alpha_vantage', 'polygon', 'finnhub', 'binance', 'coingecko', 'coincap']
         except Exception as e:
             print(f"Error cargando prioridades: {e}")
-            return ['coinmarketcap', 'coinpaprika', 'yahoo', 'cryptocompare', 'kraken', 'coingecko', 'coincap']
+            return ['coinmarketcap', 'coinpaprika', 'yahoo', 'cryptocompare', 'kraken', 'alpha_vantage', 'polygon', 'finnhub', 'binance', 'coingecko', 'coincap']
     
     def get_price_from_source(self, source: str, symbol: str) -> Optional[Dict]:
         """Obtiene precio de una fuente específica"""
@@ -152,6 +153,12 @@ class MultiSourceService:
                 return self.get_coingecko_price(symbol)
             elif source == 'coincap':
                 return self.get_coincap_price(symbol)
+            elif source == 'alpha_vantage':
+                return self.get_alpha_vantage_price(symbol)
+            elif source == 'polygon':
+                return self.get_polygon_price(symbol)
+            elif source == 'finnhub':
+                return self.get_finnhub_price(symbol)
             else:
                 return None
         except Exception as e:
@@ -346,6 +353,118 @@ class MultiSourceService:
                 }
         except Exception as e:
             return {"error": f"Error con CoinCap: {str(e)}"}
+    
+    def get_alpha_vantage_price(self, symbol: str) -> Optional[Dict]:
+        """Obtiene precio de Alpha Vantage"""
+        if not ALPHA_VANTAGE_AVAILABLE:
+            return {"error": "Alpha Vantage no está disponible"}
+        
+        try:
+            # Mapear símbolos para Alpha Vantage
+            symbol_mapping = {
+                'BTCUSDT': 'BTC',
+                'ETHUSDT': 'ETH',
+                'ADAUSDT': 'ADA',
+                'SOLUSDT': 'SOL',
+                'MATICUSDT': 'MATIC',
+                'DOTUSDT': 'DOT',
+                'SHIBUSDT': 'SHIB',
+                'SANDUSDT': 'SAND',
+                'THETAUSDT': 'THETA',
+                'MANAUSDT': 'MANA'
+            }
+            
+            av_symbol = symbol_mapping.get(symbol, symbol.replace('USDT', ''))
+            ts = TimeSeries(key=self.alpha_vantage_key, output_format='pandas')
+            
+            data, meta_data = ts.get_quote_endpoint(symbol=av_symbol)
+            
+            if data.empty:
+                return {"error": f"No se encontró precio para {symbol}"}
+            
+            return {
+                "symbol": symbol,
+                "price": float(data['05. price'].iloc[0]),
+                "change_percent": float(data['10. change percent'].iloc[0].replace('%', '')),
+                "source": "alpha_vantage"
+            }
+        except Exception as e:
+            return {"error": f"Error con Alpha Vantage: {str(e)}"}
+    
+    def get_polygon_price(self, symbol: str) -> Optional[Dict]:
+        """Obtiene precio de Polygon.io"""
+        try:
+            # Mapear símbolos para Polygon
+            symbol_mapping = {
+                'BTCUSDT': 'X:BTCUSD',
+                'ETHUSDT': 'X:ETHUSD',
+                'ADAUSDT': 'X:ADAUSD',
+                'SOLUSDT': 'X:SOLUSD',
+                'MATICUSDT': 'X:MATICUSD',
+                'DOTUSDT': 'X:DOTUSD',
+                'SHIBUSDT': 'X:SHIBUSD',
+                'SANDUSDT': 'X:SANDUSD',
+                'THETAUSDT': 'X:THETAUSD',
+                'MANAUSDT': 'X:MANAUSD'
+            }
+            
+            polygon_symbol = symbol_mapping.get(symbol, f"X:{symbol.replace('USDT', 'USD')}")
+            url = f"https://api.polygon.io/v2/snapshot/locale/global/markets/crypto/tickers/{polygon_symbol}?apiKey={self.polygon_key}"
+            
+            with httpx.Client(timeout=10, headers=self.headers) as client:
+                response = client.get(url)
+                response.raise_for_status()
+                data = response.json()
+                
+                if 'results' not in data or not data['results']:
+                    return {"error": f"No se encontró precio para {symbol}"}
+                
+                ticker_data = data['results']
+                return {
+                    "symbol": symbol,
+                    "price": float(ticker_data.get('last', {}).get('p', 0)),
+                    "change_percent": 0,  # Polygon requiere cálculo adicional
+                    "source": "polygon"
+                }
+        except Exception as e:
+            return {"error": f"Error con Polygon: {str(e)}"}
+    
+    def get_finnhub_price(self, symbol: str) -> Optional[Dict]:
+        """Obtiene precio de Finnhub"""
+        try:
+            # Mapear símbolos para Finnhub
+            symbol_mapping = {
+                'BTCUSDT': 'BINANCE:BTCUSDT',
+                'ETHUSDT': 'BINANCE:ETHUSDT',
+                'ADAUSDT': 'BINANCE:ADAUSDT',
+                'SOLUSDT': 'BINANCE:SOLUSDT',
+                'MATICUSDT': 'BINANCE:MATICUSDT',
+                'DOTUSDT': 'BINANCE:DOTUSDT',
+                'SHIBUSDT': 'BINANCE:SHIBUSDT',
+                'SANDUSDT': 'BINANCE:SANDUSDT',
+                'THETAUSDT': 'BINANCE:THETAUSDT',
+                'MANAUSDT': 'BINANCE:MANAUSDT'
+            }
+            
+            finnhub_symbol = symbol_mapping.get(symbol, f"BINANCE:{symbol}")
+            url = f"https://finnhub.io/api/v1/quote?symbol={finnhub_symbol}&token={self.finnhub_key}"
+            
+            with httpx.Client(timeout=10, headers=self.headers) as client:
+                response = client.get(url)
+                response.raise_for_status()
+                data = response.json()
+                
+                if 'c' not in data or data['c'] == 0:
+                    return {"error": f"No se encontró precio para {symbol}"}
+                
+                return {
+                    "symbol": symbol,
+                    "price": float(data['c']),
+                    "change_percent": float(data.get('dp', 0)),
+                    "source": "finnhub"
+                }
+        except Exception as e:
+            return {"error": f"Error con Finnhub: {str(e)}"}
     
     def process_price_data(self, symbol: str, data: Dict, period: str = "1d") -> Dict:
         """Procesa los datos de precio para el formato esperado"""
