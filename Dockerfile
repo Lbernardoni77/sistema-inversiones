@@ -25,15 +25,12 @@ COPY backend/ .
 # Crear directorio para la base de datos
 RUN mkdir -p data
 
-# Crear tablas al inicio
-RUN python create_tables.py
-
 # Variables de entorno por defecto
 ENV PYTHONUNBUFFERED=1
 ENV PORT=8000
 
-# Hacer ejecutable el script de inicio
-RUN chmod +x start.sh
+# Hacer ejecutable el script de entrada
+RUN chmod +x entrypoint.sh
 
 # Exponer puerto
 EXPOSE 8000
@@ -42,5 +39,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/healthz || exit 1
 
-# Comando de inicio usando el script
-CMD ["/app/start.sh"]
+# Usar ENTRYPOINT en lugar de CMD
+ENTRYPOINT ["/bin/sh", "/app/entrypoint.sh"]
