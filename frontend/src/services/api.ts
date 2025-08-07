@@ -7,6 +7,9 @@ const api = axios.create({
   timeout: 30000, // Aumentado a 30 segundos
 });
 
+// Exportar la URL base para usar en otros componentes
+export { API_BASE_URL as baseURL };
+
 export interface TickerPrice {
   symbol: string;
   price: number;

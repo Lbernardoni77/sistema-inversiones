@@ -327,6 +327,102 @@ def binance_snapshot(tickers: List[str] = Body(..., embed=True)):
 def binance_klines(symbol: str, interval: str = Query("1d"), limit: int = Query(30)):
     return binance_service.get_multi_source_klines(symbol, interval, limit)
 
+@app.get("/charts/candlestick/{symbol}")
+def generate_candlestick_chart(
+    symbol: str, 
+    interval: str = Query("1h"), 
+    limit: int = Query(100),
+    show_indicators: bool = Query(True),
+    show_support_resistance: bool = Query(True),
+    width: int = Query(1200),
+    height: int = Query(600)
+):
+    """Genera un gráfico de velas con los datos obtenidos"""
+    try:
+        from services.chart_generator import ChartGenerator
+        
+        # Obtener klines
+        klines = binance_service.get_multi_source_klines(symbol, interval, limit)
+        
+        if not klines or len(klines) < 2:
+            return {
+                "error": "No se pudieron obtener datos suficientes para generar el gráfico",
+                "symbol": symbol,
+                "interval": interval
+            }
+        
+        # Generar gráfico
+        chart_generator = ChartGenerator()
+        result = chart_generator.generate_candlestick_chart(
+            klines=klines,
+            symbol=symbol,
+            interval=interval,
+            show_indicators=show_indicators,
+            show_support_resistance=show_support_resistance,
+            width=width,
+            height=height
+        )
+        
+        return result
+        
+    except Exception as e:
+        return {
+            "error": f"Error generando gráfico: {str(e)}",
+            "symbol": symbol,
+            "interval": interval
+        }
+
+@app.get("/charts/price/{symbol}")
+def generate_price_chart(
+    symbol: str,
+    period: str = Query("1d"),
+    width: int = Query(800),
+    height: int = Query(400)
+):
+    """Genera un gráfico simple de precios"""
+    try:
+        from services.chart_generator import ChartGenerator
+        from datetime import datetime, timedelta
+        
+        # Obtener datos de precio
+        price_data = binance_service.get_multi_source_price(symbol)
+        
+        if not price_data or "price" not in price_data:
+            return {
+                "error": "No se pudo obtener el precio para generar el gráfico",
+                "symbol": symbol
+            }
+        
+        # Simular datos históricos (en un sistema real, obtendrías esto de una base de datos)
+        current_price = price_data["price"]
+        current_time = datetime.now()
+        
+        # Crear datos simulados para demostración
+        prices = []
+        for i in range(24):  # Últimas 24 horas
+            time = current_time - timedelta(hours=23-i)
+            # Simular variación de precio
+            variation = (i - 12) * 0.01  # Variación del 1%
+            price = current_price * (1 + variation)
+            prices.append((time, price))
+        
+        # Generar gráfico
+        chart_generator = ChartGenerator()
+        result = chart_generator.generate_price_chart(
+            prices=prices,
+            symbol=symbol,
+            width=width,
+            height=height
+        )
+        
+        return result
+        
+    except Exception as e:
+        return {
+            "error": f"Error generando gráfico de precios: {str(e)}",
+            "symbol": symbol
+        }
+
 @app.post("/tickers/add")
 def add_ticker(symbol: str):
     session = SessionLocal()
