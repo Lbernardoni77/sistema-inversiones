@@ -131,10 +131,10 @@ class MultiSourceService:
                     return config.get('source_order', [])
             else:
                 # Prioridades por defecto si no existe el archivo
-                return ['coinmarketcap', 'coinpaprika', 'yahoo', 'cryptocompare', 'kraken', 'alpha_vantage', 'polygon', 'finnhub', 'binance', 'coingecko', 'coincap']
+                return ['binance', 'yahoo', 'coinmarketcap', 'cryptocompare', 'coinpaprika', 'kraken', 'alpha_vantage', 'polygon', 'finnhub', 'coingecko', 'coincap']
         except Exception as e:
             print(f"Error cargando prioridades: {e}")
-            return ['coinmarketcap', 'coinpaprika', 'yahoo', 'cryptocompare', 'kraken', 'alpha_vantage', 'polygon', 'finnhub', 'binance', 'coingecko', 'coincap']
+            return ['binance', 'yahoo', 'coinmarketcap', 'cryptocompare', 'coinpaprika', 'kraken', 'alpha_vantage', 'polygon', 'finnhub', 'coingecko', 'coincap']
     
     def get_price_from_source(self, source: str, symbol: str) -> Optional[Dict]:
         """Obtiene precio de una fuente específica"""
