@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://sistema-inversiones.onrender.com';
+const API_BASE_URL = 'https://inversiones-backend-production.up.railway.app';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -116,4 +116,4 @@ export const apiService = {
   },
 };
 
-export default apiService; 
+export default apiService;
