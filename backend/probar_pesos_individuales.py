@@ -3,7 +3,7 @@ import os
 sys.path.append(os.path.dirname(__file__))
 
 from services.learning_service import optimize_all_tickers, get_ticker_performance_summary, load_weights
-from services.binance_service import get_recommendation
+from services.binance_service import BinanceService
 
 def probar_pesos_individuales():
     """Prueba el nuevo sistema de pesos individuales por ticker"""
@@ -88,16 +88,19 @@ def probar_pesos_individuales():
     try:
         # Probar con BTCUSDT
         print("   Probando recomendación para BTCUSDT...")
-        rec = get_recommendation("BTCUSDT", "24h")
+        binance_service = BinanceService()
+        rec = binance_service.get_recommendation("BTCUSDT")
         
         if "error" not in rec:
-            print(f"      Recomendación: {rec.get('recomendacion')}")
-            print(f"      Puntaje: {rec.get('puntaje_total')}")
-            print(f"      Motivo: {rec.get('motivo', 'N/A')}")
+            print(f"      Recomendación: {rec.get('recommendation')}")
+            print(f"      Confidence: {rec.get('confidence')}%")
+            print(f"      Precio: {rec.get('price')}")
             
-            # Verificar que se están usando pesos específicos
-            if 'pesos_aplicados' in rec:
-                print(f"      Pesos aplicados: {rec['pesos_aplicados']}")
+            # Verificar indicadores
+            indicators = rec.get('indicators', {})
+            if indicators:
+                print(f"      RSI: {indicators.get('rsi')}")
+                print(f"      MACD: {indicators.get('macd')}")
         else:
             print(f"      ❌ Error: {rec['error']}")
             

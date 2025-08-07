@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from sqlalchemy.orm import Session
 from models import Signal, Ticker
-from services.binance_service import get_recommendation
+from services.binance_service import BinanceService
 # Import will be handled in the function to avoid circular imports
 
 WEIGHTS_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'indicator_weights.json')
