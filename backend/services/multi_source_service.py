@@ -118,8 +118,8 @@ class MultiSourceService:
             }
         }
         
-        # Cargar prioridades dinámicas
-        self.source_priorities = self.load_source_priorities()
+        # Orden de prioridad de fuentes (se puede modificar dinámicamente)
+        self.source_priorities = ['binance']  # Temporalmente solo Binance para testing
     
     def load_source_priorities(self) -> List[str]:
         """Carga las prioridades de fuentes desde el archivo de configuración"""

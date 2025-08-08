@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, Body
+from fastapi import FastAPI, Query, Body, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from services.binance_service import BinanceService
 from services.multi_source_service import MultiSourceService
@@ -22,8 +22,10 @@ import json
 from services.learning_service import optimize_weights
 from services.reporting_service import ReportingService
 from datetime import datetime
+import logging
 
 app = FastAPI()
+logger = logging.getLogger(__name__)
 
 # Configurar CORS
 app.add_middleware(
@@ -197,8 +199,27 @@ def health_check():
     return {"status": "healthy", "message": "Sistema de Inversiones funcionando correctamente"}
 
 @app.get("/binance/price/{symbol}")
-def binance_price(symbol: str, period: str = Query("1d", enum=["1d", "1mo", "1y", "all"])):
-    return multi_source_service.get_price(symbol, period)
+async def get_binance_price(symbol: str, period: str = "1d"):
+    """Obtener precio actual y porcentaje de cambio calculado"""
+    try:
+        # Obtener precio actual
+        price_data = binance_service.get_price(symbol)
+        if not price_data:
+            raise HTTPException(status_code=404, detail=f"No se pudo obtener precio para {symbol}")
+        
+        # Calcular porcentaje de cambio usando nuestro método
+        percentage_change = binance_service.calculate_percentage_change(symbol, period)
+        
+        return {
+            "symbol": symbol,
+            "price": price_data['price'],
+            "change_24h": percentage_change,  # Usar nuestro cálculo
+            "timestamp": price_data['timestamp'],
+            "period": period
+        }
+    except Exception as e:
+        logger.error(f"Error obteniendo precio para {symbol}: {e}")
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
 
 @app.get("/binance/recommendation/{symbol}")
 def binance_recommendation(symbol: str, horizonte: str = Query("24h", enum=["1h", "4h", "12h", "24h", "7d", "1mes"])):
@@ -319,7 +340,7 @@ def binance_snapshot(tickers: List[str] = Body(..., embed=True)):
             "obv": rec.get("obv"),
             "vwap": rec.get("vwap")
         }
-        log_signal(symbol, rec.get("price"), indicadores, rec.get("recomendacion"))
+        # log_signal(symbol, rec.get("price"), indicadores, rec.get("recomendacion")) # This line was removed as per the new_code
         resultados.append({"symbol": symbol, "recomendacion": rec.get("recomendacion"), "indicadores": indicadores})
     return {"resultados": resultados}
 

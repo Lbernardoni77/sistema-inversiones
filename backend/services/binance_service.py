@@ -13,6 +13,15 @@ from datetime import datetime, timedelta
 import sqlite3
 import pandas as pd
 import numpy as np
+import requests
+import pandas as pd
+import numpy as np
+from typing import Optional, Dict, Any, List
+import logging
+from datetime import datetime, timedelta
+import time
+
+logger = logging.getLogger(__name__)
 
 # Configuración de API Keys
 BINANCE_API_KEY = os.getenv('BINANCE_API_KEY', '')
@@ -517,3 +526,71 @@ class BinanceService:
                 "confidence": 0,
                 "score": 0
             } 
+
+    def calculate_percentage_change(self, symbol: str, period: str = '1d') -> Optional[float]:
+        """
+        Calcular el porcentaje de cambio basado en datos históricos
+        
+        Args:
+            symbol: Símbolo del ticker (ej: 'BTCUSDT')
+            period: Período para el cálculo ('1d', '1mo', '1y', 'all')
+        
+        Returns:
+            Porcentaje de cambio como float (ej: -2.5 para -2.5%)
+        """
+        try:
+            # Obtener precio actual
+            current_price_data = self.get_price(symbol)
+            if not current_price_data:
+                return None
+            
+            current_price = current_price_data['price']
+            
+            # Determinar el intervalo y límite basado en el período
+            interval_map = {
+                '1d': ('1d', 2),      # 2 días para calcular vs día anterior
+                '1mo': ('1d', 32),     # 32 días para calcular vs mes anterior
+                '1y': ('1d', 366),     # 366 días para calcular vs año anterior
+                'all': ('1d', 1000)    # Máximo histórico disponible
+            }
+            
+            interval, limit = interval_map.get(period, ('1d', 2))
+            
+            # Obtener datos históricos
+            klines = self.get_klines(symbol, interval, limit)
+            if not klines or len(klines) < 2:
+                logger.error(f"No hay suficientes datos históricos para {symbol}")
+                return None
+            
+            # Encontrar el precio de referencia según el período
+            reference_price = None
+            
+            if period == '1d':
+                # Precio de cierre del día anterior
+                reference_price = klines[-2]['close']
+            elif period == '1mo':
+                # Precio de cierre hace ~30 días
+                if len(klines) >= 30:
+                    reference_price = klines[-30]['close']
+                else:
+                    reference_price = klines[0]['close']  # Primer dato disponible
+            elif period == '1y':
+                # Precio de cierre hace ~365 días
+                if len(klines) >= 365:
+                    reference_price = klines[-365]['close']
+                else:
+                    reference_price = klines[0]['close']  # Primer dato disponible
+            elif period == 'all':
+                # Precio inicial histórico
+                reference_price = klines[0]['close']
+            
+            if reference_price is None or reference_price == 0:
+                logger.error(f"No se pudo obtener precio de referencia para {symbol}")
+                return None
+            
+            # Calcular porcentaje de cambio
+            percentage_change = ((current_price - reference_price) / reference_price) * 100
+            
+            logger.info(f"Calculado cambio para {symbol}: actual={current_price}, referencia={reference_price}, cambio={percentage_change:.2f}%")
+            
+            return round(percentage_change, 2) 
