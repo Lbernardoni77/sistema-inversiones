@@ -46,6 +46,42 @@ engine = create_engine(f'sqlite:///{DB_PATH}', connect_args={"check_same_thread"
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base.metadata.create_all(bind=engine)
 
+def initialize_default_tickers():
+    """Inicializa tickers por defecto si la base de datos está vacía"""
+    session = SessionLocal()
+    try:
+        ticker_count = session.query(Ticker).count()
+        if ticker_count == 0:
+            default_tickers = [
+                "BTCUSDT",
+                "ETHUSDT", 
+                "ADAUSDT",
+                "SOLUSDT",
+                "MATICUSDT",
+                "DOTUSDT",
+                "SHIBUSDT",
+                "SANDUSDT",
+                "THETAUSDT",
+                "MANAUSDT"
+            ]
+            
+            for symbol in default_tickers:
+                ticker = Ticker(symbol=symbol)
+                session.add(ticker)
+            
+            session.commit()
+            print(f"✅ Inicializados {len(default_tickers)} tickers por defecto")
+        else:
+            print(f"✅ Base de datos ya tiene {ticker_count} tickers")
+    except Exception as e:
+        print(f"❌ Error inicializando tickers: {e}")
+        session.rollback()
+    finally:
+        session.close()
+
+# Inicializar tickers por defecto al arrancar
+initialize_default_tickers()
+
 # Configurar el scheduler para jobs automáticos
 scheduler = BackgroundScheduler()
 
