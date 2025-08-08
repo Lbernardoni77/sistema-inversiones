@@ -540,7 +540,7 @@ class BinanceService:
         """
         try:
             # Obtener precio actual
-            current_price_data = self.get_price(symbol)
+            current_price_data = self.get_multi_source_price(symbol)
             if not current_price_data:
                 return None
             
@@ -557,7 +557,7 @@ class BinanceService:
             interval, limit = interval_map.get(period, ('1d', 2))
             
             # Obtener datos históricos
-            klines = self.get_klines(symbol, interval, limit)
+            klines = self.get_multi_source_klines(symbol, interval, limit)
             if not klines or len(klines) < 2:
                 logger.error(f"No hay suficientes datos históricos para {symbol}")
                 return None
@@ -593,4 +593,8 @@ class BinanceService:
             
             logger.info(f"Calculado cambio para {symbol}: actual={current_price}, referencia={reference_price}, cambio={percentage_change:.2f}%")
             
-            return round(percentage_change, 2) 
+            return round(percentage_change, 2)
+            
+        except Exception as e:
+            logger.error(f"Error calculando porcentaje de cambio para {symbol}: {e}")
+            return None 
