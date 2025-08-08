@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate, useParams } from '
 import TickerInput from './components/TickerInput';
 import TickerCard from './components/TickerCard';
 import TickerDetails from './components/TickerDetails';
-import LocalChart from './components/LocalChart';
+import TradingViewChart from './components/TradingViewChart';
 import HorizonSelector from './components/HorizonSelector';
 import apiService, { TickerRecommendation, TickerRecommendationSummary } from './services/api';
 
@@ -426,14 +426,12 @@ function Dashboard() {
                   </select>
                 </div>
                 <div style={{ marginBottom: 32 }}>
-                  <LocalChart
+                  <TradingViewChart
                     symbol={selectedChartSymbol}
                     interval={chartInterval}
-                    limit={getKlinesLimit(chartRange, chartInterval)}
-                    showIndicators={true}
-                    showSupportResistance={true}
+                    theme="dark"
+                    width={800}
                     height={400}
-                    chartType="candlestick"
                   />
                 </div>
                 <div style={{ color: '#888', fontSize: 14, marginBottom: 8 }}>
@@ -563,14 +561,12 @@ function TickerDetailPage() {
           </select>
         </div>
         <div style={{ marginBottom: 32 }}>
-          <LocalChart
+          <TradingViewChart
             symbol={symbol || ''}
             interval={chartInterval}
-            limit={getKlinesLimit(chartRange, chartInterval)}
-            showIndicators={true}
-            showSupportResistance={true}
+            theme="dark"
+            width={800}
             height={400}
-            chartType="candlestick"
           />
         </div>
         <TickerDetails
