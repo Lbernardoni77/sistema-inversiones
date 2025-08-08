@@ -169,34 +169,42 @@ function Dashboard() {
           console.log('Setting tickers:', tickersWithData);
           console.log('Tickers with priceChange values:', tickersWithData.map(t => ({ symbol: t.symbol, priceChange: t.priceChange })));
           
-          // Solo actualizar el estado si los datos son diferentes
+          // Solo actualizar el estado si los datos son diferentes y no son todos ceros
           setTickers(prevTickers => {
             const hasChanged = JSON.stringify(prevTickers) !== JSON.stringify(tickersWithData);
-            console.log('State update needed:', hasChanged);
+            const hasValidData = tickersWithData.some(t => t.priceChange !== 0);
+            console.log('State update needed:', hasChanged, 'Has valid data:', hasValidData);
+            
+            // Si no hay datos válidos, mantener el estado anterior
+            if (!hasValidData && prevTickers.length > 0) {
+              console.log('Keeping previous state due to no valid data');
+              return prevTickers;
+            }
+            
             return hasChanged ? tickersWithData : prevTickers;
           });
         } else {
           console.warn('No valid tickers from backend:', backendTickers);
-          setTickers([]);
+          // No actualizar el estado si no hay datos válidos
         }
       } catch (error) {
         console.error('Error cargando tickers del backend:', error);
-        setTickers([]);
+        // No actualizar el estado en caso de error
       } finally {
         setIsLoadingTickers(false);
         console.log('Finished loading tickers from backend');
       }
     };
     
-    // Debounce para prevenir múltiples llamadas
+    // Debounce más largo para prevenir llamadas duplicadas
     const timeoutId = setTimeout(() => {
       loadTickersFromBackend();
-    }, 300);
+    }, 500);
     
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [selectedHorizon, isLoadingTickers]);
+  }, [selectedHorizon]); // Removido isLoadingTickers del array de dependencias
 
   // Actualizar el símbolo del gráfico por defecto al primer ticker
   React.useEffect(() => {
