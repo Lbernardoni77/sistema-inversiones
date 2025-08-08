@@ -68,6 +68,8 @@ function Dashboard() {
   const [chartInterval, setChartInterval] = useState<string>('1d');
   // Variables eliminadas: klines y selectedChartRecommendation (ya no son necesarias con LocalChart)
   const [selectedHorizon, setSelectedHorizon] = useState<string>("24h");
+  const [isLoadingTickers, setIsLoadingTickers] = useState(false); // Nuevo estado para prevenir llamadas duplicadas
+  
   const chartRangeOptions = [
     { value: '1d', label: '1 Día', limit: 1 },
     { value: '1mo', label: '1 Mes', limit: 30 },
@@ -96,6 +98,15 @@ function Dashboard() {
   // Cargar tickers desde el backend al iniciar
   React.useEffect(() => {
     const loadTickersFromBackend = async () => {
+      // Prevenir llamadas duplicadas
+      if (isLoadingTickers) {
+        console.log('Loading tickers already in progress, skipping...');
+        return;
+      }
+      
+      setIsLoadingTickers(true);
+      console.log('Starting to load tickers from backend...');
+      
       try {
         const backendTickers = await apiService.getTickersFromBackend();
         console.log('Backend tickers response:', backendTickers);
@@ -171,11 +182,21 @@ function Dashboard() {
       } catch (error) {
         console.error('Error cargando tickers del backend:', error);
         setTickers([]);
+      } finally {
+        setIsLoadingTickers(false);
+        console.log('Finished loading tickers from backend');
       }
     };
     
-    loadTickersFromBackend();
-  }, [selectedHorizon]);
+    // Debounce para prevenir múltiples llamadas
+    const timeoutId = setTimeout(() => {
+      loadTickersFromBackend();
+    }, 300);
+    
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [selectedHorizon, isLoadingTickers]);
 
   // Actualizar el símbolo del gráfico por defecto al primer ticker
   React.useEffect(() => {
