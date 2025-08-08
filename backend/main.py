@@ -233,25 +233,25 @@ def binance_recommendation(symbol: str, horizonte: str = Query("24h", enum=["1h"
     ajuste_noticias = "Sin ajuste"
     if score > 0:
         if recomendacion == "NEUTRAL":
-            recomendacion = "BUY"
+            recomendacion = "COMPRAR"
             ajuste_noticias = "Noticias positivas reforzaron señal de compra"
-        elif recomendacion == "SELL":
+        elif recomendacion == "VENDER":
             recomendacion = "NEUTRAL"
             ajuste_noticias = "Noticias positivas moderaron señal de venta"
     elif score < 0:
         if recomendacion == "NEUTRAL":
-            recomendacion = "SELL"
+            recomendacion = "VENDER"
             ajuste_noticias = "Noticias negativas reforzaron señal de venta"
-        elif recomendacion == "BUY":
+        elif recomendacion == "COMPRAR":
             recomendacion = "NEUTRAL"
             ajuste_noticias = "Noticias negativas moderaron señal de compra"
     # Ajuste por Fear & Greed
     ajuste_fg = "Sin ajuste"
     if fg_value is not None:
-        if fg_value > 75 and recomendacion == "BUY":
+        if fg_value > 75 and recomendacion == "COMPRAR":
             recomendacion = "NEUTRAL"
             ajuste_fg = "Fear & Greed alto (>75) moderó señal de compra"
-        elif fg_value < 25 and recomendacion == "SELL":
+        elif fg_value < 25 and recomendacion == "VENDER":
             recomendacion = "NEUTRAL"
             ajuste_fg = "Fear & Greed bajo (<25) moderó señal de venta"
     # Resumen de ponderación

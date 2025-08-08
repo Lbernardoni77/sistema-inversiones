@@ -12,6 +12,7 @@ export interface TickerPrice {
   price: number;
   close_yesterday?: number;
   change_percent?: number;
+  change_24h?: number;
 }
 
 export interface TickerRecommendation {

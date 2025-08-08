@@ -113,7 +113,7 @@ function Dashboard() {
                   symbol,
                   price: precioNumerico,
                   recommendation: recommendation?.recomendacion || 'Mantener',
-                  priceChange: price.change_percent ?? 0,
+                  priceChange: price.change_24h ?? 0,
                   lastUpdate: new Date(),
                   hasData: true,
                 });
