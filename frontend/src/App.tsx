@@ -110,15 +110,20 @@ function Dashboard() {
               
               console.log(`Price data for ${symbol}:`, price);
               console.log(`Recommendation data for ${symbol}:`, recommendation);
+              console.log(`change_24h value for ${symbol}:`, price.change_24h);
+              console.log(`change_24h type for ${symbol}:`, typeof price.change_24h);
               
               const precioNumerico = typeof price.price === 'string' ? parseFloat(String(price.price).replace(',', '.')) : price.price;
               
               if (price && typeof precioNumerico === 'number' && !isNaN(precioNumerico)) {
+                const priceChangeValue = price.change_24h ?? 0;
+                console.log(`Final priceChange value for ${symbol}:`, priceChangeValue);
+                
                 tickersWithData.push({
                   symbol,
                   price: precioNumerico,
                   recommendation: recommendation?.recomendacion || 'Mantener',
-                  priceChange: price.change_24h ?? 0,
+                  priceChange: priceChangeValue,
                   lastUpdate: new Date(),
                   hasData: true,
                 });

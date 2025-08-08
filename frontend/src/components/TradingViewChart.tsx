@@ -119,10 +119,7 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({
           }
         });
 
-        // Manejar errores del widget
-        widget.onChartReady(() => {
-          console.log(`TradingView chart loaded for ${symbol}`);
-        });
+        console.log(`TradingView widget created for ${symbol}`);
 
       } catch (error) {
         console.error('Error creating TradingView widget:', error);
