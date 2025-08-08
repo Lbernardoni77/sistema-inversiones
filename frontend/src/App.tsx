@@ -95,6 +95,62 @@ function Dashboard() {
     localStorage.setItem('tickerPeriods', JSON.stringify(tickerPeriods));
   }, [tickerPeriods]);
 
+  // Cargar tickers desde el backend al iniciar
+  React.useEffect(() => {
+    const loadTickersFromBackend = async () => {
+      try {
+        const backendTickers = await apiService.getTickersFromBackend();
+        if (backendTickers.tickers && backendTickers.tickers.length > 0) {
+          // Cargar datos para cada ticker del backend
+          const tickersWithData: TickerData[] = [];
+          for (const symbol of backendTickers.tickers) {
+            try {
+              const price = await apiService.getTickerPrice(symbol, '1d');
+              const recommendation = await apiService.getTickerRecommendation(symbol, selectedHorizon);
+              
+              const precioNumerico = typeof price.price === 'string' ? parseFloat(String(price.price).replace(',', '.')) : price.price;
+              
+              if (price && typeof precioNumerico === 'number' && !isNaN(precioNumerico)) {
+                tickersWithData.push({
+                  symbol,
+                  price: precioNumerico,
+                  recommendation: recommendation?.recomendacion || 'Mantener',
+                  priceChange: price.change_percent ?? 0,
+                  lastUpdate: new Date(),
+                  hasData: true,
+                });
+              } else {
+                tickersWithData.push({
+                  symbol,
+                  price: 0,
+                  recommendation: 'Sin datos',
+                  priceChange: 0,
+                  lastUpdate: new Date(),
+                  hasData: false,
+                });
+              }
+            } catch (error) {
+              console.error(`Error cargando datos para ${symbol}:`, error);
+              tickersWithData.push({
+                symbol,
+                price: 0,
+                recommendation: 'Sin datos',
+                priceChange: 0,
+                lastUpdate: new Date(),
+                hasData: false,
+              });
+            }
+          }
+          setTickers(tickersWithData);
+        }
+      } catch (error) {
+        console.error('Error cargando tickers del backend:', error);
+      }
+    };
+    
+    loadTickersFromBackend();
+  }, [selectedHorizon]);
+
   // Actualizar el símbolo del gráfico por defecto al primer ticker
   React.useEffect(() => {
     if (!selectedChartSymbol && tickers.length > 0) {
