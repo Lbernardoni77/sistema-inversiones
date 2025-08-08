@@ -540,7 +540,7 @@ class BinanceService:
         """
         try:
             # Obtener precio actual
-            current_price_data = self.get_multi_source_price(symbol)
+            current_price_data = self.get_binance_price(symbol)
             if not current_price_data:
                 return None
             
@@ -557,7 +557,7 @@ class BinanceService:
             interval, limit = interval_map.get(period, ('1d', 2))
             
             # Obtener datos históricos
-            klines = self.get_multi_source_klines(symbol, interval, limit)
+            klines = self.get_binance_klines(symbol, interval, limit)
             if not klines or len(klines) < 2:
                 logger.error(f"No hay suficientes datos históricos para {symbol}")
                 return None
@@ -566,23 +566,23 @@ class BinanceService:
             reference_price = None
             
             if period == '1d':
-                # Precio de cierre del día anterior
-                reference_price = klines[-2]['close']
+                # Precio de cierre del día anterior (índice 4 es close)
+                reference_price = klines[-2][4]
             elif period == '1mo':
                 # Precio de cierre hace ~30 días
                 if len(klines) >= 30:
-                    reference_price = klines[-30]['close']
+                    reference_price = klines[-30][4]
                 else:
-                    reference_price = klines[0]['close']  # Primer dato disponible
+                    reference_price = klines[0][4]  # Primer dato disponible
             elif period == '1y':
                 # Precio de cierre hace ~365 días
                 if len(klines) >= 365:
-                    reference_price = klines[-365]['close']
+                    reference_price = klines[-365][4]
                 else:
-                    reference_price = klines[0]['close']  # Primer dato disponible
+                    reference_price = klines[0][4]  # Primer dato disponible
             elif period == 'all':
                 # Precio inicial histórico
-                reference_price = klines[0]['close']
+                reference_price = klines[0][4]
             
             if reference_price is None or reference_price == 0:
                 logger.error(f"No se pudo obtener precio de referencia para {symbol}")
