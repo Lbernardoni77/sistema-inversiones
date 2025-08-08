@@ -156,6 +156,7 @@ function Dashboard() {
             }
           }
           console.log('Setting tickers:', tickersWithData);
+          console.log('Tickers with priceChange values:', tickersWithData.map(t => ({ symbol: t.symbol, priceChange: t.priceChange })));
           setTickers(tickersWithData);
         } else {
           console.warn('No valid tickers from backend:', backendTickers);
@@ -396,29 +397,32 @@ function Dashboard() {
             <h2 className="section-title">📈 Tickers en Seguimiento</h2>
             <TickerInput onAddTicker={handleAddTicker} isLoading={isLoading} />
             <div>
-              {tickers.map((ticker) => (
-                <div key={ticker.symbol} style={{ display: 'flex', alignItems: 'center', background: selectedChartSymbol === ticker.symbol ? 'rgba(102,126,234,0.15)' : 'transparent', border: selectedChartSymbol === ticker.symbol ? '2px solid #667eea' : '2px solid transparent', borderRadius: 10, marginBottom: 4, transition: 'background 0.2s, border 0.2s' }}>
-                  <TickerCard
-                    symbol={ticker.symbol}
-                    price={ticker.price}
-                    recommendation={ticker.recommendation}
-                    priceChange={ticker.priceChange}
-                    onClick={() => window.open(`/detalle/${ticker.symbol}`, '_blank')}
-                    onRemove={() => handleRemoveTicker(ticker.symbol)}
-                    isSelected={false}
-                    period={tickerPeriods[ticker.symbol] || '1d'}
-                    onPeriodChange={(period) => handlePeriodChange(ticker.symbol, period)}
-                    hasData={ticker.hasData !== false} // true si hasData es true o undefined, false si es false
-                  />
-                  <button
-                    title="Mostrar gráfico"
-                    style={{ marginLeft: 8, fontSize: 20, background: 'none', border: 'none', cursor: 'pointer', color: '#667eea' }}
-                    onClick={() => setSelectedChartSymbol(ticker.symbol)}
-                  >
-                    📊
-                  </button>
-                </div>
-              ))}
+              {tickers.map(ticker => {
+                console.log(`Rendering TickerCard for ${ticker.symbol}:`, { priceChange: ticker.priceChange, type: typeof ticker.priceChange });
+                return (
+                  <div key={ticker.symbol} style={{ display: 'flex', alignItems: 'center', background: selectedChartSymbol === ticker.symbol ? 'rgba(102,126,234,0.15)' : 'transparent', border: selectedChartSymbol === ticker.symbol ? '2px solid #667eea' : '2px solid transparent', borderRadius: 10, marginBottom: 4, transition: 'background 0.2s, border 0.2s' }}>
+                    <TickerCard
+                      symbol={ticker.symbol}
+                      price={ticker.price}
+                      recommendation={ticker.recommendation}
+                      priceChange={ticker.priceChange}
+                      onClick={() => window.open(`/detalle/${ticker.symbol}`, '_blank')}
+                      onRemove={() => handleRemoveTicker(ticker.symbol)}
+                      isSelected={false}
+                      period={tickerPeriods[ticker.symbol] || '1d'}
+                      onPeriodChange={(period) => handlePeriodChange(ticker.symbol, period)}
+                      hasData={ticker.hasData !== false} // true si hasData es true o undefined, false si es false
+                    />
+                    <button
+                      title="Mostrar gráfico"
+                      style={{ marginLeft: 8, fontSize: 20, background: 'none', border: 'none', cursor: 'pointer', color: '#667eea' }}
+                      onClick={() => setSelectedChartSymbol(ticker.symbol)}
+                    >
+                      📊
+                    </button>
+                  </div>
+                );
+              })}
             </div>
             {tickers.length === 0 && (
               <div className="empty-state">
