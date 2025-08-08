@@ -98,13 +98,18 @@ function Dashboard() {
     const loadTickersFromBackend = async () => {
       try {
         const backendTickers = await apiService.getTickersFromBackend();
-        if (backendTickers.tickers && backendTickers.tickers.length > 0) {
+        console.log('Backend tickers response:', backendTickers);
+        
+        if (backendTickers && backendTickers.tickers && Array.isArray(backendTickers.tickers) && backendTickers.tickers.length > 0) {
           // Cargar datos para cada ticker del backend
           const tickersWithData: TickerData[] = [];
           for (const symbol of backendTickers.tickers) {
             try {
               const price = await apiService.getTickerPrice(symbol, '1d');
               const recommendation = await apiService.getTickerRecommendation(symbol, selectedHorizon);
+              
+              console.log(`Price data for ${symbol}:`, price);
+              console.log(`Recommendation data for ${symbol}:`, recommendation);
               
               const precioNumerico = typeof price.price === 'string' ? parseFloat(String(price.price).replace(',', '.')) : price.price;
               
@@ -118,6 +123,7 @@ function Dashboard() {
                   hasData: true,
                 });
               } else {
+                console.warn(`Invalid price data for ${symbol}:`, price);
                 tickersWithData.push({
                   symbol,
                   price: 0,
@@ -139,10 +145,15 @@ function Dashboard() {
               });
             }
           }
+          console.log('Setting tickers:', tickersWithData);
           setTickers(tickersWithData);
+        } else {
+          console.warn('No valid tickers from backend:', backendTickers);
+          setTickers([]);
         }
       } catch (error) {
         console.error('Error cargando tickers del backend:', error);
+        setTickers([]);
       }
     };
     
