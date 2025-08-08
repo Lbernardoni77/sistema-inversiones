@@ -157,7 +157,13 @@ function Dashboard() {
           }
           console.log('Setting tickers:', tickersWithData);
           console.log('Tickers with priceChange values:', tickersWithData.map(t => ({ symbol: t.symbol, priceChange: t.priceChange })));
-          setTickers(tickersWithData);
+          
+          // Solo actualizar el estado si los datos son diferentes
+          setTickers(prevTickers => {
+            const hasChanged = JSON.stringify(prevTickers) !== JSON.stringify(tickersWithData);
+            console.log('State update needed:', hasChanged);
+            return hasChanged ? tickersWithData : prevTickers;
+          });
         } else {
           console.warn('No valid tickers from backend:', backendTickers);
           setTickers([]);
