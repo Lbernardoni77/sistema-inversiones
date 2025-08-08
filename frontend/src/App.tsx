@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import TickerInput from './components/TickerInput';
@@ -69,6 +69,7 @@ function Dashboard() {
   // Variables eliminadas: klines y selectedChartRecommendation (ya no son necesarias con LocalChart)
   const [selectedHorizon, setSelectedHorizon] = useState<string>("24h");
   const [isLoadingTickers, setIsLoadingTickers] = useState(false); // Nuevo estado para prevenir llamadas duplicadas
+  const [lastSuccessfulData, setLastSuccessfulData] = useState<TickerData[]>([]); // Cache de datos exitosos
   
   const chartRangeOptions = [
     { value: '1d', label: '1 Día', limit: 1 },
@@ -96,66 +97,61 @@ function Dashboard() {
   }, [tickerPeriods]);
 
   // Cargar tickers desde el backend al iniciar
-  React.useEffect(() => {
-    const loadTickersFromBackend = async () => {
-      // Prevenir llamadas duplicadas
-      if (isLoadingTickers) {
-        console.log('Loading tickers already in progress, skipping...');
-        return;
-      }
+  const loadTickersFromBackend = useCallback(async () => {
+    // Prevenir llamadas duplicadas
+    if (isLoadingTickers) {
+      console.log('Loading tickers already in progress, skipping...');
+      return;
+    }
+    
+    setIsLoadingTickers(true);
+    console.log('Starting to load tickers from backend...');
+    
+    try {
+      const backendTickers = await apiService.getTickersFromBackend();
+      console.log('Backend tickers response:', backendTickers);
       
-      setIsLoadingTickers(true);
-      console.log('Starting to load tickers from backend...');
-      
-      try {
-        const backendTickers = await apiService.getTickersFromBackend();
-        console.log('Backend tickers response:', backendTickers);
+      if (backendTickers && backendTickers.tickers && Array.isArray(backendTickers.tickers) && backendTickers.tickers.length > 0) {
+        // Cargar datos para cada ticker del backend
+        const tickersWithData: TickerData[] = [];
+        let hasValidData = false;
         
-        if (backendTickers && backendTickers.tickers && Array.isArray(backendTickers.tickers) && backendTickers.tickers.length > 0) {
-          // Cargar datos para cada ticker del backend
-          const tickersWithData: TickerData[] = [];
-          for (const symbol of backendTickers.tickers) {
-            try {
-              const price = await apiService.getTickerPrice(symbol, '1d');
-              const recommendation = await apiService.getTickerRecommendation(symbol, selectedHorizon);
+        for (const symbol of backendTickers.tickers) {
+          try {
+            const price = await apiService.getTickerPrice(symbol, '1d');
+            const recommendation = await apiService.getTickerRecommendation(symbol, selectedHorizon);
+            
+            console.log(`Price data for ${symbol}:`, price);
+            console.log(`Recommendation data for ${symbol}:`, recommendation);
+            console.log(`change_24h value for ${symbol}:`, price.change_24h);
+            console.log(`change_24h type for ${symbol}:`, typeof price.change_24h);
+            
+            const precioNumerico = typeof price.price === 'string' ? parseFloat(String(price.price).replace(',', '.')) : price.price;
+            
+            if (price && typeof precioNumerico === 'number' && !isNaN(precioNumerico)) {
+              const priceChangeValue = price.change_24h ?? 0;
+              console.log(`Final priceChange value for ${symbol}:`, priceChangeValue);
+              console.log(`priceChangeValue type:`, typeof priceChangeValue);
+              console.log(`priceChangeValue is number:`, typeof priceChangeValue === 'number');
               
-              console.log(`Price data for ${symbol}:`, price);
-              console.log(`Recommendation data for ${symbol}:`, recommendation);
-              console.log(`change_24h value for ${symbol}:`, price.change_24h);
-              console.log(`change_24h type for ${symbol}:`, typeof price.change_24h);
+              const tickerData = {
+                symbol,
+                price: precioNumerico,
+                recommendation: recommendation?.recomendacion || 'Mantener',
+                priceChange: priceChangeValue,
+                lastUpdate: new Date(),
+                hasData: true,
+              };
               
-              const precioNumerico = typeof price.price === 'string' ? parseFloat(String(price.price).replace(',', '.')) : price.price;
+              console.log(`Created ticker data for ${symbol}:`, tickerData);
+              tickersWithData.push(tickerData);
               
-              if (price && typeof precioNumerico === 'number' && !isNaN(precioNumerico)) {
-                const priceChangeValue = price.change_24h ?? 0;
-                console.log(`Final priceChange value for ${symbol}:`, priceChangeValue);
-                console.log(`priceChangeValue type:`, typeof priceChangeValue);
-                console.log(`priceChangeValue is number:`, typeof priceChangeValue === 'number');
-                
-                const tickerData = {
-                  symbol,
-                  price: precioNumerico,
-                  recommendation: recommendation?.recomendacion || 'Mantener',
-                  priceChange: priceChangeValue,
-                  lastUpdate: new Date(),
-                  hasData: true,
-                };
-                
-                console.log(`Created ticker data for ${symbol}:`, tickerData);
-                tickersWithData.push(tickerData);
-              } else {
-                console.warn(`Invalid price data for ${symbol}:`, price);
-                tickersWithData.push({
-                  symbol,
-                  price: 0,
-                  recommendation: 'Sin datos',
-                  priceChange: 0,
-                  lastUpdate: new Date(),
-                  hasData: false,
-                });
+              // Marcar que tenemos datos válidos si al menos uno tiene priceChange !== 0
+              if (priceChangeValue !== 0) {
+                hasValidData = true;
               }
-            } catch (error) {
-              console.error(`Error cargando datos para ${symbol}:`, error);
+            } else {
+              console.warn(`Invalid price data for ${symbol}:`, price);
               tickersWithData.push({
                 symbol,
                 price: 0,
@@ -165,46 +161,69 @@ function Dashboard() {
                 hasData: false,
               });
             }
+          } catch (error) {
+            console.error(`Error cargando datos para ${symbol}:`, error);
+            tickersWithData.push({
+              symbol,
+              price: 0,
+              recommendation: 'Sin datos',
+              priceChange: 0,
+              lastUpdate: new Date(),
+              hasData: false,
+            });
           }
-          console.log('Setting tickers:', tickersWithData);
-          console.log('Tickers with priceChange values:', tickersWithData.map(t => ({ symbol: t.symbol, priceChange: t.priceChange })));
-          
-          // Solo actualizar el estado si los datos son diferentes y no son todos ceros
-          setTickers(prevTickers => {
-            const hasChanged = JSON.stringify(prevTickers) !== JSON.stringify(tickersWithData);
-            const hasValidData = tickersWithData.some(t => t.priceChange !== 0);
-            console.log('State update needed:', hasChanged, 'Has valid data:', hasValidData);
-            
-            // Si no hay datos válidos, mantener el estado anterior
-            if (!hasValidData && prevTickers.length > 0) {
-              console.log('Keeping previous state due to no valid data');
-              return prevTickers;
-            }
-            
-            return hasChanged ? tickersWithData : prevTickers;
-          });
-        } else {
-          console.warn('No valid tickers from backend:', backendTickers);
-          // No actualizar el estado si no hay datos válidos
         }
-      } catch (error) {
-        console.error('Error cargando tickers del backend:', error);
-        // No actualizar el estado en caso de error
-      } finally {
-        setIsLoadingTickers(false);
-        console.log('Finished loading tickers from backend');
+        
+        console.log('Setting tickers:', tickersWithData);
+        console.log('Tickers with priceChange values:', tickersWithData.map(t => ({ symbol: t.symbol, priceChange: t.priceChange })));
+        console.log('Has valid data:', hasValidData);
+        
+        // SOLUCIÓN DEFINITIVA: Solo actualizar si tenemos datos válidos
+        if (hasValidData) {
+          console.log('✅ Updating state with valid data');
+          setTickers(tickersWithData);
+          setLastSuccessfulData(tickersWithData); // Guardar como cache
+        } else {
+          console.log('⚠️ No valid data, keeping previous state');
+          // Mantener el estado anterior si no hay datos válidos
+          if (lastSuccessfulData.length > 0) {
+            setTickers(lastSuccessfulData);
+          }
+        }
+      } else {
+        console.warn('No valid tickers from backend:', backendTickers);
+        // Usar cache si no hay datos del backend
+        if (lastSuccessfulData.length > 0) {
+          console.log('Using cached data');
+          setTickers(lastSuccessfulData);
+        }
       }
-    };
-    
+    } catch (error) {
+      console.error('Error cargando tickers del backend:', error);
+      // Usar cache en caso de error
+      if (lastSuccessfulData.length > 0) {
+        console.log('Using cached data due to error');
+        setTickers(lastSuccessfulData);
+      }
+    } finally {
+      setIsLoadingTickers(false);
+      console.log('Finished loading tickers from backend');
+    }
+  }, [selectedHorizon, isLoadingTickers, lastSuccessfulData]);
+
+  // Usar useMemo para estabilizar el efecto
+  const stableLoadTickers = useMemo(() => loadTickersFromBackend, [loadTickersFromBackend]);
+
+  React.useEffect(() => {
     // Debounce más largo para prevenir llamadas duplicadas
     const timeoutId = setTimeout(() => {
-      loadTickersFromBackend();
+      stableLoadTickers();
     }, 500);
     
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [selectedHorizon]); // Removido isLoadingTickers del array de dependencias
+  }, [stableLoadTickers]);
 
   // Actualizar el símbolo del gráfico por defecto al primer ticker
   React.useEffect(() => {
