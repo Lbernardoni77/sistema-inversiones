@@ -203,7 +203,7 @@ async def get_binance_price(symbol: str, period: str = "1d"):
     """Obtener precio actual y porcentaje de cambio calculado"""
     try:
         # Obtener precio actual
-        price_data = binance_service.get_price(symbol)
+        price_data = binance_service.get_binance_price(symbol)
         if not price_data:
             raise HTTPException(status_code=404, detail=f"No se pudo obtener precio para {symbol}")
         
@@ -214,7 +214,7 @@ async def get_binance_price(symbol: str, period: str = "1d"):
             "symbol": symbol,
             "price": price_data['price'],
             "change_24h": percentage_change,  # Usar nuestro cálculo
-            "timestamp": price_data['timestamp'],
+            "timestamp": price_data.get('timestamp', datetime.now().isoformat()),
             "period": period
         }
     except Exception as e:
