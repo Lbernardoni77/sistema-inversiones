@@ -105,18 +105,11 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({
             'BB@tv-basicstudies'
           ],
           disabled_features: [
-            'use_localstorage_for_settings',
-            'volume_force_overlay'
+            'use_localstorage_for_settings'
           ],
           enabled_features: [
             'study_templates'
-          ],
-          overrides: {
-            'mainSeriesProperties.candleStyle.upColor': '#26a69a',
-            'mainSeriesProperties.candleStyle.downColor': '#ef5350',
-            'mainSeriesProperties.candleStyle.wickUpColor': '#26a69a',
-            'mainSeriesProperties.candleStyle.wickDownColor': '#ef5350'
-          }
+          ]
         });
 
         console.log(`TradingView widget created for ${symbol}`);

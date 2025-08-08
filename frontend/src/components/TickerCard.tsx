@@ -34,6 +34,14 @@ const TickerCard: React.FC<TickerCardProps> = ({
 }) => {
   const [showMenu, setShowMenu] = useState(false);
 
+  const formatPriceChange = (change: number) => {
+    const sign = change >= 0 ? '+' : '';
+    return `${sign}${change.toFixed(2)}%`;
+  };
+
+  // Debug logging
+  console.log(`TickerCard ${symbol}:`, { priceChange, type: typeof priceChange, formatted: formatPriceChange(priceChange) });
+
   const getRecommendationColor = (rec: string) => {
     switch (rec.toLowerCase()) {
       case 'comprar':
@@ -63,11 +71,6 @@ const TickerCard: React.FC<TickerCardProps> = ({
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(price);
-  };
-
-  const formatPriceChange = (change: number) => {
-    const sign = change >= 0 ? '+' : '';
-    return `${sign}${change.toFixed(2)}%`;
   };
 
   const handlePeriodClick = (e: React.MouseEvent) => {
