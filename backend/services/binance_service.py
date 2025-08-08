@@ -495,10 +495,10 @@ class BinanceService:
             
             # Determinar señal
             if normalized_score > 0.3:
-                signal = "BUY"
+                signal = "COMPRAR"
                 confidence = min(abs(normalized_score) * 100, 100)
             elif normalized_score < -0.3:
-                signal = "SELL"
+                signal = "VENDER"
                 confidence = min(abs(normalized_score) * 100, 100)
             else:
                 signal = "NEUTRAL"

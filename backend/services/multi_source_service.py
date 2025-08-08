@@ -263,10 +263,20 @@ class MultiSourceService:
                 if 'USD' not in data:
                     return {"error": f"No se encontró precio para {symbol}"}
                 
+                # Obtener cambio porcentual de CryptoCompare
+                change_url = f"https://min-api.cryptocompare.com/data/pricemultifull?fsyms={cryptocompare_symbol}&tsyms=USD"
+                change_response = client.get(change_url)
+                change_response.raise_for_status()
+                change_data = change_response.json()
+                
+                change_percent = 0
+                if 'RAW' in change_data and cryptocompare_symbol in change_data['RAW']:
+                    change_percent = change_data['RAW'][cryptocompare_symbol]['USD'].get('CHANGEPCT24HOUR', 0)
+                
                 return {
                     "symbol": symbol,
                     "price": data['USD'],
-                    "change_percent": 0,  # CryptoCompare requiere endpoint adicional para cambio
+                    "change_percent": change_percent,
                     "source": "cryptocompare"
                 }
         except Exception as e:

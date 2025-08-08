@@ -40,22 +40,22 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({
         // Limpiar el contenedor
         containerRef.current.innerHTML = '';
 
-        // Mapear símbolos de Binance a TradingView
-        const symbolMapping: { [key: string]: string } = {
-          'BTCUSDT': 'BINANCE:BTCUSDT',
-          'ETHUSDT': 'BINANCE:ETHUSDT',
-          'ADAUSDT': 'BINANCE:ADAUSDT',
-          'SOLUSDT': 'BINANCE:SOLUSDT',
-          'MATICUSDT': 'BINANCE:MATICUSDT',
-          'DOTUSDT': 'BINANCE:DOTUSDT',
-          'SHIBUSDT': 'BINANCE:SHIBUSDT',
-          'SANDUSDT': 'BINANCE:SANDUSDT',
-          'THETAUSDT': 'BINANCE:THETAUSDT',
-          'MANAUSDT': 'BINANCE:MANAUSDT',
-          'SUSDT': 'BINANCE:SUSDT'
-        };
+                 // Mapear símbolos a formatos más simples para TradingView
+         const symbolMapping: { [key: string]: string } = {
+           'BTCUSDT': 'BTCUSDT',
+           'ETHUSDT': 'ETHUSDT',
+           'ADAUSDT': 'ADAUSDT',
+           'SOLUSDT': 'SOLUSDT',
+           'MATICUSDT': 'MATICUSDT',
+           'DOTUSDT': 'DOTUSDT',
+           'SHIBUSDT': 'SHIBUSDT',
+           'SANDUSDT': 'SANDUSDT',
+           'THETAUSDT': 'THETAUSDT',
+           'MANAUSDT': 'MANAUSDT',
+           'SUSDT': 'SUSDT'
+         };
 
-        const tradingViewSymbol = symbolMapping[symbol] || `BINANCE:${symbol}`;
+         const tradingViewSymbol = symbolMapping[symbol] || symbol;
 
         new window.TradingView.widget({
           autosize: true,
