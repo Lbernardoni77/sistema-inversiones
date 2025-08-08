@@ -98,18 +98,7 @@ const TradingViewChart: React.FC<TradingViewChartProps> = ({
           allow_symbol_change: false,
           container_id: containerRef.current.id,
           width: width,
-          height: height,
-          studies: [
-            'RSI@tv-basicstudies',
-            'MACD@tv-basicstudies',
-            'BB@tv-basicstudies'
-          ],
-          disabled_features: [
-            'use_localstorage_for_settings'
-          ],
-          enabled_features: [
-            'study_templates'
-          ]
+          height: height
         });
 
         console.log(`TradingView widget created for ${symbol}`);

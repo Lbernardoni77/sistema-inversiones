@@ -118,15 +118,20 @@ function Dashboard() {
               if (price && typeof precioNumerico === 'number' && !isNaN(precioNumerico)) {
                 const priceChangeValue = price.change_24h ?? 0;
                 console.log(`Final priceChange value for ${symbol}:`, priceChangeValue);
+                console.log(`priceChangeValue type:`, typeof priceChangeValue);
+                console.log(`priceChangeValue is number:`, typeof priceChangeValue === 'number');
                 
-                tickersWithData.push({
+                const tickerData = {
                   symbol,
                   price: precioNumerico,
                   recommendation: recommendation?.recomendacion || 'Mantener',
                   priceChange: priceChangeValue,
                   lastUpdate: new Date(),
                   hasData: true,
-                });
+                };
+                
+                console.log(`Created ticker data for ${symbol}:`, tickerData);
+                tickersWithData.push(tickerData);
               } else {
                 console.warn(`Invalid price data for ${symbol}:`, price);
                 tickersWithData.push({
