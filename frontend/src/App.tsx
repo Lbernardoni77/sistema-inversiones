@@ -56,10 +56,7 @@ function getKlinesLimit(range: string, interval: string): number {
 }
 
 function Dashboard() {
-  const [tickers, setTickers] = useState<TickerData[]>(() => {
-    const saved = localStorage.getItem('tickers');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [tickers, setTickers] = useState<TickerData[]>([]);
   const [tickerPeriods, setTickerPeriods] = useState<{ [symbol: string]: string }>(() => {
     const saved = localStorage.getItem('tickerPeriods');
     return saved ? JSON.parse(saved) : {};
@@ -87,9 +84,10 @@ function Dashboard() {
     { value: '1w', label: '1 Semana' },
   ];
 
-  // Guardar en localStorage cuando cambian los tickers o los periodos
+  // Guardar en localStorage solo tickers con datos válidos
   React.useEffect(() => {
-    localStorage.setItem('tickers', JSON.stringify(tickers));
+    const validTickers = tickers.filter(ticker => ticker.hasData && ticker.price > 0);
+    localStorage.setItem('tickers', JSON.stringify(validTickers));
   }, [tickers]);
   React.useEffect(() => {
     localStorage.setItem('tickerPeriods', JSON.stringify(tickerPeriods));
